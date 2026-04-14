@@ -1,11 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20"]
-
-[phases.install]
-cmds = ["npm ci", "cd api && npm ci"]
-
-[phases.build]
-cmds = ["npm run build"]
+nixPkgs = ["nodejs_22"]
 
 [start]
-cmd = "NODE_ENV=production node api/server.js"
+cmd = "npm run preview -- --host 0.0.0.0 --port $PORT"
