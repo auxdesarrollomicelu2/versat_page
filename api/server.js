@@ -1,7 +1,12 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 import emailRouter from './routes/email.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // Cargar variables de entorno PRIMERO
 dotenv.config()
@@ -39,6 +44,17 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/email', emailRouter)
 
+// Servir archivos estáticos del frontend en producción
+if (process.env.NODE_ENV === 'production') {
+  const distPath = join(__dirname, '..', 'dist')
+  app.use(express.static(distPath))
+  
+  // Todas las rutas no API devuelven el index.html (SPA)
+  app.get('*', (req, res) => {
+    res.sendFile(join(distPath, 'index.html'))
+  })
+}
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error('Error:', err)
@@ -48,13 +64,15 @@ app.use((err, req, res, next) => {
   })
 })
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' })
-})
+// 404 handler (solo para rutas API en desarrollo)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res) => {
+    res.status(404).json({ error: 'Endpoint not found' })
+  })
+}
 
-app.listen(PORT, () => {
-  console.log(`✅ Versat API running on http://localhost:${PORT}`)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Versat API running on http://0.0.0.0:${PORT}`)
   console.log(`📧 Email service: Azure Communication Services`)
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
 })
