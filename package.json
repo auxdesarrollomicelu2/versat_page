@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "cd api && npm start"
+    "preview": "vite preview --host"
   },
   "dependencies": {
     "clsx": "^2.1.1",
