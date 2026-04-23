@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { VERSAT_NAV_LINKS } from '../../lib/versat.constants'
 import { useBooking } from '../../hooks/useBooking'
@@ -7,14 +7,7 @@ import logo from '../../assets/images/versat.logo.png'
 
 export default function VersatNavbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const booking = useBooking()
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   return (
     <>
