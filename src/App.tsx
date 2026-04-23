@@ -15,12 +15,12 @@ function App() {
       <VersatNavbar />
       <main>
         <VersatHero />
-        <VersatClients />
         <VersatSlider />
         <VersatFeatures />
         <VersatStats />
         <VersatHowItWorks />
         <VersatTestimonials />
+        <VersatClients />
         <VersatCTA />
       </main>
       <VersatFooter />

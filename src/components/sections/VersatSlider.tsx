@@ -62,7 +62,7 @@ export default function VersatSlider() {
             {[...VERSAT_SLIDER.items, ...VERSAT_SLIDER.items].map((item, index) => (
               <div
                 key={`${item.name}-${index}`}
-                className="relative flex items-center justify-center gap-3 min-w-[180px] md:min-w-[220px] h-16 md:h-20 px-6 md:px-10 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
+                className="relative flex items-center justify-center gap-2 min-w-[140px] md:min-w-[160px] h-12 md:h-14 px-4 md:px-6 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
               >
                 {/* Borde con gradiente */}
                 <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-accent/60 via-accent/30 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-300">
@@ -70,13 +70,14 @@ export default function VersatSlider() {
                 </div>
                 
                 {/* Contenido */}
-                <div className="relative z-10 flex items-center gap-3">
+                <div className="relative z-10 flex items-center gap-2">
                   <img 
                     src={TechIcons[item.icon]} 
                     alt={item.name}
-                    className="w-8 h-8 md:w-10 md:h-10 group-hover:scale-110 transition-transform duration-300"
+                    className="w-6 h-6 md:w-8 md:h-8 group-hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
                   />
-                  <span className="text-gray-300 group-hover:text-white font-semibold text-base md:text-lg whitespace-nowrap transition-colors duration-300">
+                  <span className="text-gray-300 group-hover:text-white font-semibold text-sm md:text-base whitespace-nowrap transition-colors duration-300">
                     {item.name}
                   </span>
                 </div>
@@ -101,7 +102,7 @@ export default function VersatSlider() {
             {[...VERSAT_SLIDER.items, ...VERSAT_SLIDER.items].map((item, index) => (
               <div
                 key={`${item.name}-duplicate-${index}`}
-                className="relative flex items-center justify-center gap-3 min-w-[180px] md:min-w-[220px] h-16 md:h-20 px-6 md:px-10 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
+                className="relative flex items-center justify-center gap-2 min-w-[140px] md:min-w-[160px] h-12 md:h-14 px-4 md:px-6 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
               >
                 {/* Borde con gradiente */}
                 <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-accent/60 via-accent/30 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-300">
@@ -109,13 +110,14 @@ export default function VersatSlider() {
                 </div>
                 
                 {/* Contenido */}
-                <div className="relative z-10 flex items-center gap-3">
+                <div className="relative z-10 flex items-center gap-2">
                   <img 
                     src={TechIcons[item.icon]} 
                     alt={item.name}
-                    className="w-8 h-8 md:w-10 md:h-10 group-hover:scale-110 transition-transform duration-300"
+                    className="w-6 h-6 md:w-8 md:h-8 group-hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
                   />
-                  <span className="text-gray-300 group-hover:text-white font-semibold text-base md:text-lg whitespace-nowrap transition-colors duration-300">
+                  <span className="text-gray-300 group-hover:text-white font-semibold text-sm md:text-base whitespace-nowrap transition-colors duration-300">
                     {item.name}
                   </span>
                 </div>

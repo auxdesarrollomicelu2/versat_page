@@ -3,8 +3,25 @@ import { Monitor, Settings, Zap, BarChart, Database, ShoppingBag, ArrowUpRight }
 import { VERSAT_FEATURES } from '../../lib/versat.constants'
 import { useState } from 'react'
 
+// Importar las imágenes disponibles
+import imgAutomatizacion from '../../assets/images/automatizacion.png'
+import imgConsultoria from '../../assets/images/consultoria.png'
+import imgAnalisisDatos from '../../assets/images/analisis.png'
+import imgDesarrolloWeb from '../../assets/images/web.png'
+import imgSistemasMedida from '../../assets/images/medida.png'
+import imgRetail from '../../assets/images/retail.png'
+
 const ICONS: Record<string, React.ElementType> = {
   Monitor, Settings, Zap, BarChart, Database, ShoppingBag,
+}
+
+const FEATURE_IMAGES: Record<string, string> = {
+  'desarrollo-web.jpg': imgDesarrolloWeb,
+  'sistemas-medida.jpg': imgSistemasMedida,
+  'automatizacion.jpg': imgAutomatizacion,
+  'consultoria.jpg': imgConsultoria,
+  'analisis-datos.jpg': imgAnalisisDatos,
+  'retail.jpg': imgRetail,
 }
 
 export default function VersatFeatures() {
@@ -14,7 +31,8 @@ export default function VersatFeatures() {
     <section id="servicios" className="bg-dark py-24 px-6">
       <div className="max-w-7xl mx-auto">
 
-        <div className="text-center mb-16">
+        {/* Encabezado */}
+        <div className="text-center mb-14">
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -30,9 +48,6 @@ export default function VersatFeatures() {
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-4xl md:text-5xl font-black text-white mt-3 mb-4"
-            style={{
-              textShadow: '0 0 40px rgba(255, 255, 255, 0.1)'
-            }}
           >
             Todo lo que tu empresa necesita
           </motion.h2>
@@ -47,11 +62,13 @@ export default function VersatFeatures() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid de cards - 2 por fila */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 max-w-6xl mx-auto">
           {VERSAT_FEATURES.map((feature, index) => {
             const Icon = ICONS[feature.icon]
             const isHovered = hoveredIndex === index
-            
+            const bgImage = FEATURE_IMAGES[feature.image]
+
             return (
               <motion.div
                 key={feature.title}
@@ -61,44 +78,86 @@ export default function VersatFeatures() {
                 transition={{ delay: index * 0.1 }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                className="relative bg-dark-card border border-dark-border rounded-2xl overflow-hidden group cursor-pointer h-[320px] transition-all duration-500"
+                className="relative bg-dark-card border border-dark-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 group hover:shadow-2xl hover:shadow-accent/10 aspect-[16/10] md:aspect-[16/9]"
               >
-                {/* Imagen de fondo con overlay */}
-                <div className={`absolute inset-0 transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-dark/70 z-10" />
-                  <div className="w-full h-full bg-accent/10 flex items-center justify-center">
-                    <Icon size={120} className="text-accent/20" />
+                {/* Imagen de fondo en hover */}
+                {bgImage && (
+                  <div
+                    className={`absolute inset-0 transition-all duration-700 ${
+                      isHovered ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <img 
+                      src={bgImage} 
+                      alt={feature.title}
+                      className="absolute inset-0 w-full h-full object-cover object-center"
+                      loading="lazy"
+                    />
+                    {/* Overlay oscuro fuerte para legibilidad */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/60" />
                   </div>
-                </div>
+                )}
+
+                {/* Gradiente de fondo para cards sin imagen */}
+                {!bgImage && (
+                  <div
+                    className={`absolute inset-0 transition-opacity duration-500 ${
+                      isHovered ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/15 via-accent/5 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-card/95 via-dark-card/60 to-transparent" />
+                  </div>
+                )}
+
+                {/* Borde teal en hover */}
+                <div
+                  className={`absolute inset-0 rounded-2xl border-2 border-accent transition-opacity duration-300 pointer-events-none ${
+                    isHovered ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
 
                 {/* Contenido */}
-                <div className="relative z-20 p-6 h-full flex flex-col justify-between">
-                  <div>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${
-                      isHovered ? 'bg-accent/20 scale-110' : 'bg-accent/10'
-                    }`}>
-                      <Icon size={22} className="text-accent" />
+                <div className="relative z-20 p-6 md:p-8 h-full flex flex-col justify-between">
+
+                  <div className="flex flex-col gap-3 md:gap-4">
+                    {/* Ícono */}
+                    <div
+                      className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all duration-300 backdrop-blur-sm ${
+                        isHovered ? 'bg-accent/40 scale-110' : 'bg-accent/10'
+                      }`}
+                    >
+                      <Icon size={20} className="text-accent drop-shadow-lg md:w-6 md:h-6" />
                     </div>
-                    <h3 className="text-white font-bold text-xl mb-3">{feature.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
+
+                    {/* Texto */}
+                    <div>
+                      <h3 className="text-white font-black text-xl md:text-2xl lg:text-3xl mb-2 md:mb-3 leading-tight drop-shadow-lg uppercase tracking-tight">
+                        {feature.title}
+                      </h3>
+                      <p className={`text-sm md:text-base lg:text-lg leading-relaxed transition-colors duration-300 ${
+                        isHovered ? 'text-gray-200' : 'text-gray-400'
+                      }`}>
+                        {feature.description}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className={`flex items-center gap-2 text-accent font-semibold text-sm transition-all duration-300 ${
-                    isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                  }`}>
+                  {/* CTA — aparece en hover */}
+                  <div
+                    className={`flex items-center gap-2 text-accent font-semibold text-sm transition-all duration-300 drop-shadow-lg ${
+                      isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-3'
+                    }`}
+                  >
                     Ver más
                     <ArrowUpRight size={16} />
                   </div>
                 </div>
-
-                {/* Borde animado en hover */}
-                <div className={`absolute inset-0 border-2 border-accent rounded-2xl transition-opacity duration-300 ${
-                  isHovered ? 'opacity-100' : 'opacity-0'
-                }`} />
               </motion.div>
             )
           })}
         </div>
+
       </div>
     </section>
   )

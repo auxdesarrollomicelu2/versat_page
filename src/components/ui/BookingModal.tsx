@@ -1,5 +1,5 @@
 // src/components/ui/BookingModal.tsx
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X, User, Mail, Phone, Building2,
@@ -29,7 +29,7 @@ interface BookingModalProps {
 // ─── Subcomponentes ───────────────────────────────────────────────────────────
 
 function InputField({
-  icon: Icon, label, type = 'text', value, onChange, placeholder, required,
+  icon: Icon, label, type = 'text', value, onChange, placeholder, required, fieldType,
 }: {
   icon: React.ElementType
   label: string
@@ -38,24 +38,99 @@ function InputField({
   onChange: (v: string) => void
   placeholder?: string
   required?: boolean
+  fieldType?: 'name' | 'email' | 'phone' | 'text'
 }) {
+  const [error, setError] = useState<string>('')
+
+  const handleChange = (newValue: string) => {
+    setError('')
+
+    // Validación según tipo de campo
+    if (fieldType === 'name') {
+      // Solo letras, espacios y acentos
+      const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/
+      if (!nameRegex.test(newValue)) {
+        setError('Solo se permiten letras')
+        return
+      }
+    }
+
+    if (fieldType === 'phone') {
+      // Solo números, espacios, + y guiones
+      const phoneRegex = /^[\d\s+()-]*$/
+      if (!phoneRegex.test(newValue)) {
+        setError('Solo se permiten números')
+        return
+      }
+    }
+
+    onChange(newValue)
+  }
+
+  const handleBlur = () => {
+    // Validación completa al salir del campo
+    if (fieldType === 'email' && value) {
+      // Debe contener @ y terminar en un dominio válido (.com, .co, .net, etc)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/
+      if (!emailRegex.test(value)) {
+        setError('Ingresa un correo válido (ej: usuario@empresa.com)')
+      } else if (!value.includes('@')) {
+        setError('El correo debe contener @')
+      } else if (!value.match(/\.[a-zA-Z]{2,}$/)) {
+        setError('El correo debe terminar en un dominio válido')
+      }
+    }
+
+    if (fieldType === 'phone' && value) {
+      const digitsOnly = value.replace(/\D/g, '')
+      if (digitsOnly.length < 10) {
+        setError('Ingresa un teléfono válido (mínimo 10 dígitos)')
+      }
+    }
+
+    if (fieldType === 'name' && value && required) {
+      if (value.trim().length < 3) {
+        setError('Ingresa tu nombre completo')
+      }
+    }
+  }
+
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+    <div className="flex flex-col gap-2">
+      <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
         {label} {required && <span className="text-accent">*</span>}
       </label>
-      <div className="relative">
-        <Icon size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
-        <input
-          type={type}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="w-full bg-dark-card border border-dark-border text-white placeholder-gray-600
-                     rounded-xl pl-10 pr-4 py-3 text-sm
-                     focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
-                     transition-all duration-200"
-        />
+      <div>
+        <div className="relative">
+          <Icon size={18} className={`absolute left-4 top-4 transition-colors ${
+            error ? 'text-red-500' : 'text-gray-600'
+          }`} />
+          <input
+            type={type}
+            value={value}
+            onChange={e => handleChange(e.target.value)}
+            onBlur={handleBlur}
+            placeholder={placeholder}
+            className={`w-full bg-[#1a1a1a] border text-white placeholder-gray-600
+                       rounded-xl pl-12 pr-4 py-4 text-base
+                       focus:outline-none focus:bg-[#1f1f1f]
+                       transition-all duration-200 ${
+                         error 
+                           ? 'border-red-500 focus:border-red-500' 
+                           : 'border-gray-800 focus:border-accent'
+                       }`}
+          />
+        </div>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="text-red-400 text-xs mt-1.5 flex items-center gap-1"
+          >
+            <AlertCircle size={12} />
+            {error}
+          </motion.p>
+        )}
       </div>
     </div>
   )
@@ -73,18 +148,18 @@ function SelectField({
   required?: boolean
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+    <div className="flex flex-col gap-2">
+      <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
         {label} {required && <span className="text-accent">*</span>}
       </label>
       <div className="relative">
-        <Icon size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10" />
+        <Icon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10" />
         <select
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-dark-card border border-dark-border text-white
-                     rounded-xl pl-10 pr-4 py-3 text-sm appearance-none cursor-pointer
-                     focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+          className="w-full bg-[#1a1a1a] border border-gray-800 text-white
+                     rounded-xl pl-12 pr-4 py-4 text-base appearance-none cursor-pointer
+                     focus:outline-none focus:border-accent focus:bg-[#1f1f1f]
                      transition-all duration-200"
         >
           <option value="" className="text-gray-500">{placeholder}</option>
@@ -140,17 +215,17 @@ function Step1Info({ form, onChange }: { form: BookingForm; onChange: (field: Bo
       key="step1"
       initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5"
     >
-      <div>
-        <h3 className="text-xl font-black text-white">Tu información</h3>
-        <p className="text-gray-500 text-sm mt-1">Cuéntanos quién eres para preparar la cita.</p>
+      <div className="mb-2">
+        <h3 className="text-2xl font-black text-white">Tu información</h3>
+        <p className="text-gray-500 text-base mt-2">Cuéntanos quién eres para preparar la cita.</p>
       </div>
 
-      <InputField icon={User}      label="Nombre completo" value={form.client_name}    onChange={v => onChange('client_name', v)}    placeholder="Juan Pérez"                required />
-      <InputField icon={Mail}      label="Correo"          value={form.client_email}   onChange={v => onChange('client_email', v)}   placeholder="juan@empresa.com" type="email" required />
-      <InputField icon={Phone}     label="Teléfono"        value={form.client_phone}   onChange={v => onChange('client_phone', v)}   placeholder="+57 300 000 0000" type="tel" />
-      <InputField icon={Building2} label="Empresa"         value={form.client_company} onChange={v => onChange('client_company', v)} placeholder="Mi Empresa S.A." />
+      <InputField icon={User}      label="Nombre completo" value={form.client_name}    onChange={v => onChange('client_name', v)}    placeholder="Juan Pérez"                required fieldType="name" />
+      <InputField icon={Mail}      label="Correo"          value={form.client_email}   onChange={v => onChange('client_email', v)}   placeholder="juan@empresa.com" type="email" required fieldType="email" />
+      <InputField icon={Phone}     label="Teléfono"        value={form.client_phone}   onChange={v => onChange('client_phone', v)}   placeholder="+57 300 000 0000" type="tel" fieldType="phone" />
+      <InputField icon={Building2} label="Empresa"         value={form.client_company} onChange={v => onChange('client_company', v)} placeholder="Mi Empresa S.A." fieldType="text" />
       <SelectField
         icon={Briefcase} label="Servicio de interés" value={form.service}
         onChange={v => onChange('service', v)}
@@ -171,36 +246,36 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
       key="step2"
       initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5"
     >
-      <div>
-        <h3 className="text-xl font-black text-white">Elige tu horario</h3>
-        <p className="text-gray-500 text-sm mt-1">¿Cuándo te queda mejor para hablar?</p>
+      <div className="mb-2">
+        <h3 className="text-2xl font-black text-white">Elige tu horario</h3>
+        <p className="text-gray-500 text-base mt-2">¿Cuándo te queda mejor para hablar?</p>
       </div>
 
       {/* Fecha */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+      <div className="flex flex-col gap-2">
+        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           Fecha preferida <span className="text-accent">*</span>
         </label>
         <div className="relative">
-          <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
           <input
             type="date"
             min={minDate}
             value={form.preferred_date}
             onChange={e => onChange('preferred_date', e.target.value)}
-            className="w-full bg-dark-card border border-dark-border text-white
-                       rounded-xl pl-10 pr-4 py-3 text-sm
-                       focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+            className="w-full bg-[#1a1a1a] border border-gray-800 text-white
+                       rounded-xl pl-12 pr-4 py-4 text-base
+                       focus:outline-none focus:border-accent focus:bg-[#1f1f1f]
                        transition-all duration-200 [color-scheme:dark]"
           />
         </div>
       </div>
 
       {/* Slots de hora */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+      <div className="flex flex-col gap-2">
+        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           <Clock size={13} /> Hora preferida <span className="text-accent">*</span>
         </label>
         <div className="grid grid-cols-4 gap-2">
@@ -209,10 +284,10 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
               key={slot}
               type="button"
               onClick={() => onChange('preferred_time', slot)}
-              className={`py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200
+              className={`py-3 rounded-xl text-sm font-semibold border transition-all duration-200
                 ${form.preferred_time === slot
                   ? 'bg-accent text-dark border-accent'
-                  : 'bg-dark-card border-dark-border text-gray-400 hover:border-accent/50 hover:text-white'}`}
+                  : 'bg-[#1a1a1a] border-gray-800 text-gray-400 hover:border-accent/50 hover:text-white'}`}
             >
               {slot}
             </button>
@@ -221,8 +296,8 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
       </div>
 
       {/* Mensaje */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+      <div className="flex flex-col gap-2">
+        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           <MessageSquare size={13} /> Mensaje (opcional)
         </label>
         <textarea
@@ -230,9 +305,9 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
           onChange={e => onChange('message', e.target.value)}
           placeholder="Cuéntanos brevemente sobre tu proyecto..."
           rows={3}
-          className="w-full bg-dark-card border border-dark-border text-white placeholder-gray-600
-                     rounded-xl px-4 py-3 text-sm resize-none
-                     focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+          className="w-full bg-[#1a1a1a] border border-gray-800 text-white placeholder-gray-600
+                     rounded-xl px-4 py-4 text-base resize-none
+                     focus:outline-none focus:border-accent focus:bg-[#1f1f1f]
                      transition-all duration-200"
         />
       </div>
@@ -257,18 +332,18 @@ function Step3Confirm({ form }: { form: BookingForm }) {
       key="step3"
       initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5"
     >
-      <div>
-        <h3 className="text-xl font-black text-white">Confirma tu cita</h3>
-        <p className="text-gray-500 text-sm mt-1">Revisa los datos antes de enviar.</p>
+      <div className="mb-2">
+        <h3 className="text-2xl font-black text-white">Confirma tu cita</h3>
+        <p className="text-gray-500 text-base mt-2">Revisa los datos antes de enviar.</p>
       </div>
 
-      <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
+      <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl overflow-hidden">
         {rows.map((r, i) => (
-          <div key={r.label} className={`flex justify-between items-start px-4 py-3 ${i < rows.length - 1 ? 'border-b border-dark-border/60' : ''}`}>
-            <span className="text-xs text-gray-500 uppercase tracking-widest font-semibold w-24 shrink-0">{r.label}</span>
-            <span className="text-sm text-white text-right break-all">{r.value}</span>
+          <div key={r.label} className={`flex justify-between items-start px-5 py-4 ${i < rows.length - 1 ? 'border-b border-gray-800' : ''}`}>
+            <span className="text-[11px] text-gray-500 uppercase tracking-wider font-bold w-28 shrink-0">{r.label}</span>
+            <span className="text-base text-white text-right break-all">{r.value}</span>
           </div>
         ))}
       </div>
@@ -361,10 +436,10 @@ export default function BookingModal({
           {/* Panel */}
           <motion.div
             className="relative z-10 w-full max-w-lg bg-dark border border-dark-border rounded-3xl shadow-2xl overflow-hidden"
-            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0,  scale: 1    }}
-            exit={{   opacity: 0, y: 40, scale: 0.97  }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            exit={{   opacity: 0, y: 20, scale: 0.95  }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Accent top line */}
             <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent" />

@@ -13,9 +13,9 @@ const CLIENTS = [
 
 export default function VersatClients() {
   return (
-    <section className="bg-dark py-16 md:py-20 px-6 border-b border-dark-border/30 relative overflow-hidden">
-      {/* Fondo decorativo sutil */}
-      <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent opacity-50" />
+    <section className="bg-dark py-16 px-6 border-b border-dark-border/30 relative">
+      {/* Fondo uniforme */}
+      <div className="absolute inset-0 bg-dark" />
       
       <div className="max-w-7xl mx-auto relative z-10">
         
@@ -59,6 +59,7 @@ export default function VersatClients() {
                 src={client.logo} 
                 alt={client.name}
                 className="h-16 md:h-20 lg:h-24 w-auto object-contain opacity-70 group-hover:opacity-100 transition-all duration-300 relative z-10 filter drop-shadow-2xl"
+                loading="lazy"
               />
             </motion.div>
           ))}
