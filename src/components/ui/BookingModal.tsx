@@ -97,7 +97,7 @@ function InputField({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+      <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
         {label} {required && <span className="text-accent">*</span>}
       </label>
       <div>
@@ -149,7 +149,7 @@ function SelectField({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+      <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
         {label} {required && <span className="text-accent">*</span>}
       </label>
       <div className="relative">
@@ -192,7 +192,7 @@ function StepIndicator({ step }: { step: BookingStep }) {
               : 'bg-dark-border text-gray-500'}`}>
               {i < activeIdx ? <CheckCircle2 size={14} /> : i + 1}
             </div>
-            <span className={`text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap
+            <span className={`text-[11px] md:text-[10px] font-semibold uppercase tracking-wider
               ${i === activeIdx ? 'text-accent' : 'text-gray-600'}`}>
               {s.label}
             </span>
@@ -218,8 +218,8 @@ function Step1Info({ form, onChange }: { form: BookingForm; onChange: (field: Bo
       className="flex flex-col gap-5"
     >
       <div className="mb-2">
-        <h3 className="text-2xl font-black text-white">Tu información</h3>
-        <p className="text-gray-500 text-base mt-2">Cuéntanos quién eres para preparar la cita.</p>
+        <h3 className="text-xl md:text-2xl font-black text-white">Tu información</h3>
+        <p className="text-gray-500 text-sm md:text-base mt-2">Cuéntanos quién eres para preparar la cita.</p>
       </div>
 
       <InputField icon={User}      label="Nombre completo" value={form.client_name}    onChange={v => onChange('client_name', v)}    placeholder="Juan Pérez"                required fieldType="name" />
@@ -249,13 +249,13 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
       className="flex flex-col gap-5"
     >
       <div className="mb-2">
-        <h3 className="text-2xl font-black text-white">Elige tu horario</h3>
-        <p className="text-gray-500 text-base mt-2">¿Cuándo te queda mejor para hablar?</p>
+        <h3 className="text-xl md:text-2xl font-black text-white">Elige tu horario</h3>
+        <p className="text-gray-500 text-sm md:text-base mt-2">¿Cuándo te queda mejor para hablar?</p>
       </div>
 
       {/* Fecha */}
       <div className="flex flex-col gap-2">
-        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           Fecha preferida <span className="text-accent">*</span>
         </label>
         <div className="relative">
@@ -275,16 +275,16 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
 
       {/* Slots de hora */}
       <div className="flex flex-col gap-2">
-        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           <Clock size={13} /> Hora preferida <span className="text-accent">*</span>
         </label>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {TIME_SLOTS.map(slot => (
             <button
               key={slot}
               type="button"
               onClick={() => onChange('preferred_time', slot)}
-              className={`py-3 rounded-xl text-sm font-semibold border transition-all duration-200
+              className={`py-3 md:py-3 rounded-xl text-sm font-semibold border transition-all duration-200
                 ${form.preferred_time === slot
                   ? 'bg-accent text-dark border-accent'
                   : 'bg-[#1a1a1a] border-gray-800 text-gray-400 hover:border-accent/50 hover:text-white'}`}
@@ -297,7 +297,7 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
 
       {/* Mensaje */}
       <div className="flex flex-col gap-2">
-        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           <MessageSquare size={13} /> Mensaje (opcional)
         </label>
         <textarea
@@ -335,15 +335,15 @@ function Step3Confirm({ form }: { form: BookingForm }) {
       className="flex flex-col gap-5"
     >
       <div className="mb-2">
-        <h3 className="text-2xl font-black text-white">Confirma tu cita</h3>
-        <p className="text-gray-500 text-base mt-2">Revisa los datos antes de enviar.</p>
+        <h3 className="text-xl md:text-2xl font-black text-white">Confirma tu cita</h3>
+        <p className="text-gray-500 text-sm md:text-base mt-2">Revisa los datos antes de enviar.</p>
       </div>
 
       <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl overflow-hidden">
         {rows.map((r, i) => (
-          <div key={r.label} className={`flex justify-between items-start px-5 py-4 ${i < rows.length - 1 ? 'border-b border-gray-800' : ''}`}>
-            <span className="text-[11px] text-gray-500 uppercase tracking-wider font-bold w-28 shrink-0">{r.label}</span>
-            <span className="text-base text-white text-right break-all">{r.value}</span>
+          <div key={r.label} className={`flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 ${i < rows.length - 1 ? 'border-b border-gray-800' : ''}`}>
+            <span className="text-[11px] text-gray-500 uppercase tracking-wider font-bold sm:w-28 shrink-0">{r.label}</span>
+            <span className="text-sm sm:text-base text-white sm:text-right break-all">{r.value}</span>
           </div>
         ))}
       </div>
@@ -372,7 +372,7 @@ function StepSuccess({ onClose, form }: { onClose: () => void; form: BookingForm
       </motion.div>
 
       <div>
-        <h3 className="text-2xl font-black text-white">¡Solicitud enviada!</h3>
+        <h3 className="text-xl md:text-2xl font-black text-white">¡Solicitud enviada!</h3>
         <p className="text-gray-400 text-sm mt-2 max-w-xs mx-auto leading-relaxed">
           Hemos recibido tu solicitud, <span className="text-white font-semibold">{form.client_name.split(' ')[0]}</span>. Nos comunicaremos contigo pronto para confirmar tu cita.
         </p>
@@ -435,7 +435,7 @@ export default function BookingModal({
 
           {/* Panel */}
           <motion.div
-            className="relative z-10 w-full max-w-lg bg-dark border border-dark-border rounded-3xl shadow-2xl overflow-hidden"
+            className="relative z-10 w-full max-w-lg bg-dark border border-dark-border rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0,  scale: 1    }}
             exit={{   opacity: 0, y: 20, scale: 0.95  }}
@@ -445,10 +445,10 @@ export default function BookingModal({
             <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent" />
 
             {/* Header */}
-            <div className="flex items-start justify-between px-6 pt-6 pb-2">
+            <div className="flex items-start justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
               <div>
                 <p className="text-accent text-xs font-bold uppercase tracking-widest">Versat</p>
-                <h2 className="text-lg font-black text-white mt-0.5">Agendar cita</h2>
+                <h2 className="text-base sm:text-lg font-black text-white mt-0.5">Agendar cita</h2>
               </div>
               <button
                 onClick={onClose}
@@ -459,7 +459,7 @@ export default function BookingModal({
             </div>
 
             {/* Body */}
-            <div className="px-6 pb-6 pt-4 max-h-[80vh] overflow-y-auto">
+            <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 overflow-y-auto flex-1">
               <StepIndicator step={step} />
 
               <AnimatePresence mode="wait">
@@ -482,14 +482,14 @@ export default function BookingModal({
 
               {/* Footer de navegación */}
               {step !== 'success' && (
-                <div className="flex gap-3 mt-6">
+                <div className="flex gap-2 sm:gap-3 mt-6">
                   {(step === 'schedule' || step === 'confirm') && (
                     <button
                       onClick={onBack}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl border border-dark-border text-gray-400
+                      className="flex items-center gap-2 px-4 sm:px-5 py-3 rounded-xl border border-dark-border text-gray-400
                                  hover:text-white hover:border-gray-500 transition-all duration-200 text-sm font-semibold"
                     >
-                      <ArrowLeft size={16} /> Atrás
+                      <ArrowLeft size={16} /> <span className="hidden sm:inline">Atrás</span>
                     </button>
                   )}
 
@@ -498,7 +498,7 @@ export default function BookingModal({
                       onClick={onNext}
                       disabled={!canGoNext}
                       className="flex-1 flex items-center justify-center gap-2 bg-accent text-dark font-bold
-                                 py-3.5 rounded-xl text-sm uppercase tracking-widest
+                                 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-widest
                                  hover:bg-accent/90 transition-all duration-200 active:scale-[0.98]
                                  disabled:opacity-40 disabled:cursor-not-allowed"
                     >
@@ -509,7 +509,7 @@ export default function BookingModal({
                       onClick={onSubmit}
                       disabled={loading}
                       className="flex-1 flex items-center justify-center gap-2 bg-accent text-dark font-bold
-                                 py-3.5 rounded-xl text-sm uppercase tracking-widest
+                                 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-widest
                                  hover:bg-accent/90 transition-all duration-200 active:scale-[0.98]
                                  disabled:opacity-60 disabled:cursor-not-allowed"
                     >
