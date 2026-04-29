@@ -12,7 +12,7 @@ export default function VersatStats() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight"
           >
             {VERSAT_STATS.title}
@@ -21,7 +21,7 @@ export default function VersatStats() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.4 }}
             className="text-gray-400 text-base md:text-lg max-w-3xl mx-auto leading-relaxed"
           >
             {VERSAT_STATS.description}
@@ -33,15 +33,15 @@ export default function VersatStats() {
           {VERSAT_STATS.stats.map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              className="relative flex flex-col items-center justify-center p-8 md:p-12 rounded-3xl md:rounded-[2rem] border border-accent/20 bg-dark-card hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all duration-300 text-center group"
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+              className="relative flex flex-col items-center justify-center p-8 md:p-12 rounded-3xl md:rounded-[2rem] border border-accent/20 bg-dark-card hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all duration-200 text-center group"
             >
               {/* Glow suave en hover */}
-              <div className="absolute inset-0 rounded-3xl md:rounded-[2rem] bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              <div className="absolute inset-0 rounded-3xl md:rounded-[2rem] bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
               <span
                 className="text-5xl md:text-6xl lg:text-7xl font-black text-accent mb-3 md:mb-4 relative z-10"
@@ -58,15 +58,15 @@ export default function VersatStats() {
 
         {/* CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.4 }}
           className="text-center"
         >
           <a
             href="#contacto"
-            className="inline-block bg-accent text-dark font-bold px-8 py-4 rounded-full hover:bg-accent/90 hover:scale-105 transition-all duration-300 shadow-lg shadow-accent/20 text-base md:text-lg"
+            className="inline-block bg-accent text-dark font-bold px-8 py-4 rounded-full hover:bg-accent/90 hover:scale-105 transition-all duration-200 shadow-lg shadow-accent/20 text-base md:text-lg"
           >
             {VERSAT_STATS.cta}
           </a>

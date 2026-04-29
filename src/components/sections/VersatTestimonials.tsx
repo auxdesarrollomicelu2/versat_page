@@ -25,6 +25,7 @@ export default function VersatTestimonials() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
             className="text-accent text-sm font-semibold uppercase tracking-widest"
           >
             Testimonios
@@ -33,7 +34,7 @@ export default function VersatTestimonials() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            transition={{ duration: 0.4 }}
             className="text-4xl md:text-5xl font-black text-white mt-3 mb-4"
           >
             {VERSAT_TESTIMONIALS.title}
@@ -42,7 +43,7 @@ export default function VersatTestimonials() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            transition={{ duration: 0.4 }}
             className="text-gray-400 max-w-2xl mx-auto text-lg"
           >
             {VERSAT_TESTIMONIALS.subtitle}
@@ -58,12 +59,12 @@ export default function VersatTestimonials() {
             return (
               <motion.div
                 key={testimonial.name}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
                 onMouseEnter={() => setActiveIndex(index)}
-                className={`relative bg-dark border rounded-2xl p-8 transition-all duration-500 cursor-pointer group overflow-hidden ${
+                className={`relative bg-dark border rounded-2xl p-8 transition-all duration-300 cursor-pointer group overflow-hidden ${
                   isActive
                     ? 'border-accent shadow-lg shadow-accent/20 scale-105'
                     : 'border-dark-border hover:border-accent/30'
@@ -116,7 +117,7 @@ export default function VersatTestimonials() {
                 </div>
 
                 {/* Glow interior en hover */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </motion.div>
             )
           })}
@@ -124,10 +125,10 @@ export default function VersatTestimonials() {
 
         {/* Indicadores de paginación */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
+          transition={{ duration: 0.4 }}
           className="flex justify-center gap-2"
         >
           {VERSAT_TESTIMONIALS.testimonials.map((_, index) => (

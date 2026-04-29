@@ -34,10 +34,10 @@ export default function VersatFeatures() {
         {/* Encabezado */}
         <div className="text-center mb-14">
           <motion.span
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-accent text-sm font-semibold uppercase tracking-widest inline-block"
           >
             Nuestros servicios
@@ -46,7 +46,7 @@ export default function VersatFeatures() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1, duration: 0.6 }}
+            transition={{ duration: 0.4 }}
             className="text-4xl md:text-5xl font-black text-white mt-3 mb-4"
           >
             Todo lo que tu empresa necesita
@@ -55,7 +55,7 @@ export default function VersatFeatures() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.6 }}
+            transition={{ duration: 0.4 }}
             className="text-gray-400 max-w-xl mx-auto text-lg"
           >
             Soluciones completas para llevar tu negocio al siguiente nivel.
@@ -72,19 +72,19 @@ export default function VersatFeatures() {
             return (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                className="relative bg-dark-card border border-dark-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 group hover:shadow-2xl hover:shadow-accent/10 aspect-[16/10] md:aspect-[16/9]"
+                className="relative bg-dark-card border border-dark-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 group hover:shadow-xl hover:shadow-accent/10 aspect-[16/10] md:aspect-[16/9]"
               >
-                {/* Imagen de fondo en hover */}
+                {/* Imagen de fondo - visible en móvil con opacidad baja, full en hover desktop */}
                 {bgImage && (
                   <div
-                    className={`absolute inset-0 transition-all duration-700 ${
-                      isHovered ? 'opacity-100' : 'opacity-0'
+                    className={`absolute inset-0 transition-all duration-500 ${
+                      isHovered ? 'opacity-100' : 'opacity-30 md:opacity-0'
                     }`}
                   >
                     <img 
@@ -100,7 +100,7 @@ export default function VersatFeatures() {
                 {/* Gradiente de fondo para cards sin imagen */}
                 {!bgImage && (
                   <div
-                    className={`absolute inset-0 transition-opacity duration-500 ${
+                    className={`absolute inset-0 transition-opacity duration-300 ${
                       isHovered ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
@@ -111,7 +111,7 @@ export default function VersatFeatures() {
 
                 {/* Borde teal en hover */}
                 <div
-                  className={`absolute inset-0 rounded-2xl border-2 border-accent transition-opacity duration-300 pointer-events-none ${
+                  className={`absolute inset-0 rounded-2xl border-2 border-accent transition-opacity duration-200 pointer-events-none ${
                     isHovered ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
@@ -122,8 +122,8 @@ export default function VersatFeatures() {
                   <div className="flex flex-col gap-3 md:gap-4">
                     {/* Ícono */}
                     <div
-                      className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all duration-300 backdrop-blur-sm ${
-                        isHovered ? 'bg-accent/40 scale-110' : 'bg-accent/10'
+                      className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                        isHovered ? 'bg-accent/40 scale-105' : 'bg-accent/20'
                       }`}
                     >
                       <Icon size={20} className="text-accent drop-shadow-lg md:w-6 md:h-6" />

@@ -17,13 +17,14 @@ const TechIcons: Record<string, React.ReactNode> = {
 export default function VersatSlider() {
   return (
     <section className="bg-dark py-16 md:py-20 overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark-card/30 to-dark pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark-card/20 to-dark pointer-events-none" />
       
       <div className="max-w-7xl mx-auto mb-12 px-6 relative z-10">
         <motion.h3
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
           className="text-center text-white text-xl md:text-2xl font-bold mb-2"
         >
           {VERSAT_SLIDER.title}
@@ -32,7 +33,7 @@ export default function VersatSlider() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
+          transition={{ duration: 0.4 }}
           className="text-center text-gray-400 text-sm md:text-base"
         >
           {VERSAT_SLIDER.subtitle}
@@ -53,7 +54,7 @@ export default function VersatSlider() {
               x: {
                 repeat: Infinity,
                 repeatType: "loop",
-                duration: 25,
+                duration: 30,
                 ease: "linear",
               },
             }}
@@ -61,15 +62,15 @@ export default function VersatSlider() {
             {[...VERSAT_SLIDER.items, ...VERSAT_SLIDER.items].map((item, index) => (
               <div
                 key={`${item.name}-${index}`}
-                className="relative flex items-center justify-center gap-2 min-w-[140px] md:min-w-[160px] h-12 md:h-14 px-4 md:px-6 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
+                className="relative flex items-center justify-center gap-2 min-w-[140px] md:min-w-[160px] h-12 md:h-14 px-4 md:px-6 bg-dark-card rounded-full shadow-lg group overflow-hidden"
               >
-                <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-accent/60 via-accent/30 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-accent/40 via-accent/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-200">
                   <div className="w-full h-full bg-dark-card rounded-full" />
                 </div>
                 
                 <div className="relative z-10 flex items-center gap-2">
                   {TechIcons[item.icon]}
-                  <span className="text-gray-300 group-hover:text-white font-semibold text-sm md:text-base whitespace-nowrap transition-colors duration-300">
+                  <span className="text-gray-300 group-hover:text-white font-semibold text-sm md:text-base whitespace-nowrap transition-colors duration-200">
                     {item.name}
                   </span>
                 </div>
