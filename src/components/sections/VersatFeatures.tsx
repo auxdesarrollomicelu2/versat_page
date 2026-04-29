@@ -93,7 +93,6 @@ export default function VersatFeatures() {
                       className="absolute inset-0 w-full h-full object-cover object-center"
                       loading="lazy"
                     />
-                    {/* Overlay oscuro fuerte para legibilidad */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/60" />
                   </div>
                 )}

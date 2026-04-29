@@ -17,9 +17,9 @@ function App() {
         <VersatHero />
         <VersatSlider />
         <VersatFeatures />
+        <VersatTestimonials />
         <VersatStats />
         <VersatHowItWorks />
-        <VersatTestimonials />
         <VersatClients />
         <VersatCTA />
       </main>

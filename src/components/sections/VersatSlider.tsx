@@ -1,18 +1,17 @@
 import { motion } from 'framer-motion'
+import { Code, Database, Globe, Layers, Server, Zap } from 'lucide-react'
 import { VERSAT_SLIDER } from '../../lib/versat.constants'
 
-// Iconos SVG de tecnologías (desde simpleicons.org)
-const TechIcons: Record<string, string> = {
-  react: 'https://cdn.simpleicons.org/react/61DAFB',
-  typescript: 'https://cdn.simpleicons.org/typescript/3178C6',
-  nodedotjs: 'https://cdn.simpleicons.org/nodedotjs/339933',
-  python: 'https://cdn.simpleicons.org/python/3776AB',
-  amazonaws: 'https://cdn.simpleicons.org/amazonaws/FF9900',
-  docker: 'https://cdn.simpleicons.org/docker/2496ED',
-  postgresql: 'https://cdn.simpleicons.org/postgresql/4169E1',
-  mongodb: 'https://cdn.simpleicons.org/mongodb/47A248',
-  nextdotjs: 'https://cdn.simpleicons.org/nextdotjs/000000',
-  tailwindcss: 'https://cdn.simpleicons.org/tailwindcss/06B6D4',
+// Iconos usando Lucide React
+const TechIcons: Record<string, React.ReactNode> = {
+  react: <Code className="w-6 h-6 md:w-8 md:h-8 text-blue-400" />,
+  typescript: <Code className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />,
+  nodedotjs: <Server className="w-6 h-6 md:w-8 md:h-8 text-green-500" />,
+  python: <Zap className="w-6 h-6 md:w-8 md:h-8 text-yellow-500" />,
+  postgresql: <Database className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />,
+  mongodb: <Database className="w-6 h-6 md:w-8 md:h-8 text-green-600" />,
+  nextdotjs: <Globe className="w-6 h-6 md:w-8 md:h-8 text-white" />,
+  tailwindcss: <Layers className="w-6 h-6 md:w-8 md:h-8 text-cyan-400" />,
 }
 
 export default function VersatSlider() {
@@ -64,59 +63,12 @@ export default function VersatSlider() {
                 key={`${item.name}-${index}`}
                 className="relative flex items-center justify-center gap-2 min-w-[140px] md:min-w-[160px] h-12 md:h-14 px-4 md:px-6 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
               >
-                {/* Borde con gradiente */}
                 <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-accent/60 via-accent/30 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="w-full h-full bg-dark-card rounded-full" />
                 </div>
                 
-                {/* Contenido */}
                 <div className="relative z-10 flex items-center gap-2">
-                  <img 
-                    src={TechIcons[item.icon]} 
-                    alt={item.name}
-                    className="w-6 h-6 md:w-8 md:h-8 group-hover:scale-110 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <span className="text-gray-300 group-hover:text-white font-semibold text-sm md:text-base whitespace-nowrap transition-colors duration-300">
-                    {item.name}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            className="flex gap-4 md:gap-6 flex-shrink-0"
-            animate={{
-              x: [0, -1200],
-            }}
-            transition={{
-              x: {
-                repeat: Infinity,
-                repeatType: "loop",
-                duration: 25,
-                ease: "linear",
-              },
-            }}
-          >
-            {[...VERSAT_SLIDER.items, ...VERSAT_SLIDER.items].map((item, index) => (
-              <div
-                key={`${item.name}-duplicate-${index}`}
-                className="relative flex items-center justify-center gap-2 min-w-[140px] md:min-w-[160px] h-12 md:h-14 px-4 md:px-6 bg-dark-card backdrop-blur-sm rounded-full shadow-lg group overflow-hidden"
-              >
-                {/* Borde con gradiente */}
-                <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-accent/60 via-accent/30 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-full h-full bg-dark-card rounded-full" />
-                </div>
-                
-                {/* Contenido */}
-                <div className="relative z-10 flex items-center gap-2">
-                  <img 
-                    src={TechIcons[item.icon]} 
-                    alt={item.name}
-                    className="w-6 h-6 md:w-8 md:h-8 group-hover:scale-110 transition-transform duration-300"
-                    loading="lazy"
-                  />
+                  {TechIcons[item.icon]}
                   <span className="text-gray-300 group-hover:text-white font-semibold text-sm md:text-base whitespace-nowrap transition-colors duration-300">
                     {item.name}
                   </span>

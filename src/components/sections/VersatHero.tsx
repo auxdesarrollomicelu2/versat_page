@@ -107,47 +107,22 @@ export default function VersatHero() {
             </motion.div>
           </div>
 
-          {/* ── Columna derecha: imagen (solo en lg+) ── */}
+          {/* ── Columna derecha: imagen ── */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.5, ease: 'easeOut' }}
-            className="hidden lg:flex items-center justify-center"
+            className="flex items-center justify-center"
           >
-            <div className="relative w-full">
-              {/* Glow teal detrás */}
-              <div className="absolute -inset-4 bg-accent/10 blur-3xl rounded-3xl pointer-events-none" />
-
-              {/* Borde decorativo sutil */}
-              <div className="absolute -inset-px rounded-2xl border border-accent/20 pointer-events-none z-20" />
-
-              {/* Imagen principal */}
+            <div className="relative w-full max-w-lg lg:max-w-none">
+              <div className="absolute -inset-3 lg:-inset-4 bg-accent/10 blur-2xl lg:blur-3xl rounded-2xl lg:rounded-3xl pointer-events-none" />
+              <div className="absolute -inset-px rounded-xl lg:rounded-2xl border border-accent/20 pointer-events-none z-20" />
               <img
                 src={imagen1}
                 alt="Equipo Versat trabajando en soluciones digitales"
-                className="relative z-10 w-full rounded-2xl object-cover object-center shadow-2xl shadow-black/50"
+                className="relative z-10 w-full rounded-xl lg:rounded-2xl object-cover object-center shadow-xl lg:shadow-2xl shadow-black/40 lg:shadow-black/50"
                 style={{ aspectRatio: '16/10' }}
                 fetchPriority="high"
-              />
-            </div>
-          </motion.div>
-
-          {/* ── Imagen mobile/tablet (solo en < lg) ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex lg:hidden items-center justify-center w-full"
-          >
-            <div className="relative w-full max-w-lg">
-              <div className="absolute -inset-3 bg-accent/10 blur-2xl rounded-2xl pointer-events-none" />
-              <div className="absolute -inset-px rounded-xl border border-accent/20 pointer-events-none z-20" />
-              <img
-                src={imagen1}
-                alt="Equipo Versat trabajando en soluciones digitales"
-                className="relative z-10 w-full rounded-xl object-cover object-center shadow-xl shadow-black/40"
-                style={{ aspectRatio: '16/10' }}
-                loading="lazy"
               />
             </div>
           </motion.div>

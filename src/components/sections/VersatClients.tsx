@@ -13,7 +13,7 @@ const CLIENTS = [
 
 export default function VersatClients() {
   return (
-    <section className="bg-dark py-16 px-6 border-b border-dark-border/30 relative">
+    <section className="bg-dark py-16 px-6 relative">
       {/* Fondo uniforme */}
       <div className="absolute inset-0 bg-dark" />
       
@@ -46,14 +46,14 @@ export default function VersatClients() {
                 damping: 12
               }}
               whileHover={{ 
-                scale: 1.15, 
-                y: -8,
-                transition: { duration: 0.3, type: "spring", stiffness: 300 }
+                scale: 1.05, 
+                y: -3,
+                transition: { duration: 0.2, type: "spring", stiffness: 300 }
               }}
               className="relative group cursor-pointer"
             >
-              {/* Glow effect en hover - más intenso */}
-              <div className="absolute inset-0 bg-accent/30 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full scale-150" />
+              {/* Glow effect en hover - suave */}
+              <div className="absolute inset-0 bg-accent/10 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 rounded-full scale-150" />
               
               <img 
                 src={client.logo} 
