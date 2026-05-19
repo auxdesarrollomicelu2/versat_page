@@ -36,12 +36,13 @@ export const TIME_SLOTS = [
 ]
 
 export const SERVICES = [
-  'Desarrollo Web',
-  'Sistemas a medida',
-  'Automatización',
-  'Consultoría digital',
-  'Análisis de datos',
-  'Soluciones para retail',
+  'E-commerce',
+  'CRM a medida',
+  'Automatizacion de procesos',
+  'IA aplicada',
+  'Turnero digital',
+  'Reporteria & BI',
+  'Otro / no lo se aun',
 ]
 
 export function useBooking() {

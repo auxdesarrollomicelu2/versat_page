@@ -11,12 +11,16 @@
     "start": "vite preview --host 0.0.0.0 --port $PORT"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@studio-freight/lenis": "^1.0.42",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "tailwind-merge": "^3.5.0"
+    "sharp": "^0.34.5",
+    "tailwind-merge": "^3.5.0",
+    "vite-plugin-image-optimizer": "^2.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

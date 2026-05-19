@@ -1,137 +1,134 @@
-// src/components/ui/BookingModal.tsx
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X, User, Mail, Phone, Building2,
   Briefcase, Calendar, Clock, MessageSquare,
   CheckCircle2, ArrowRight, ArrowLeft, Loader2,
-  AlertCircle,
+  AlertCircle, MapPin,
 } from 'lucide-react'
 import { SERVICES, TIME_SLOTS } from '../../hooks/useBooking'
 import type { BookingStep, BookingForm, BookingFormField } from '../../hooks/useBooking'
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
 interface BookingModalProps {
-  isOpen:        boolean
-  onClose:       () => void
-  step:          BookingStep
-  form:          BookingForm
+  isOpen: boolean
+  onClose: () => void
+  step: BookingStep
+  form: BookingForm
   onFieldChange: (field: BookingFormField, value: string) => void
-  onNext:        () => void
-  onBack:        () => void
-  onSubmit:      () => void
-  isStep1Valid:  boolean
-  isStep2Valid:  boolean
-  loading:       boolean
-  error:         string | null
+  onNext: () => void
+  onBack: () => void
+  onSubmit: () => void
+  isStep1Valid: boolean
+  isStep2Valid: boolean
+  loading: boolean
+  error: string | null
 }
 
-// ─── Subcomponentes ───────────────────────────────────────────────────────────
+const STEP_CONFIG: Record<Exclude<BookingStep, 'success'>, {
+  num: string; kicker: string; title: string; highlight: string; subtitle: string; contextTitle: string; context: string
+}> = {
+  info: {
+    num: '01',
+    kicker: '/info',
+    title: 'Hablemos',
+    highlight: 'de ti',
+    subtitle: 'Queremos entender quien eres antes de hablar.',
+    contextTitle: 'Que esperar',
+    context: 'Responderemos en menos de 24h. No vendemos, escuchamos. Esta conversacion es gratis y sin compromiso.',
+  },
+  schedule: {
+    num: '02',
+    kicker: '/tiempo',
+    title: 'Elige',
+    highlight: 'cuando',
+    subtitle: 'Un horario c�modo hace la diferencia.',
+    contextTitle: 'La reuni�n',
+    context: 'Duraci�n: 30-45 min. Formato: video llamada o presencial en Medell�n. Idioma: espa�ol.',
+  },
+  confirm: {
+    num: '03',
+    kicker: '/confirmar',
+    title: 'Revisa',
+    highlight: 'y envia',
+    subtitle: 'Verifica los datos antes del envio.',
+    contextTitle: 'Que sigue',
+    context: 'Recibiras un correo de confirmacion. Nos pondremos en contacto para ajustar detalles o proponer alternativas si hace falta.',
+  },
+}
+
+// ─── Input field ──────────────────────────────────────────────────────────────
 
 function InputField({
   icon: Icon, label, type = 'text', value, onChange, placeholder, required, fieldType,
 }: {
-  icon: React.ElementType
-  label: string
-  type?: string
-  value: string
-  onChange: (v: string) => void
-  placeholder?: string
-  required?: boolean
+  icon: React.ElementType; label: string; type?: string; value: string
+  onChange: (v: string) => void; placeholder?: string; required?: boolean
   fieldType?: 'name' | 'email' | 'phone' | 'text'
 }) {
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState('')
+  const [focused, setFocused] = useState(false)
 
   const handleChange = (newValue: string) => {
     setError('')
-
-    // Validación según tipo de campo
-    if (fieldType === 'name') {
-      // Solo letras, espacios y acentos
-      const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/
-      if (!nameRegex.test(newValue)) {
-        setError('Solo se permiten letras')
-        return
-      }
-    }
-
-    if (fieldType === 'phone') {
-      // Solo números, espacios, + y guiones
-      const phoneRegex = /^[\d\s+()-]*$/
-      if (!phoneRegex.test(newValue)) {
-        setError('Solo se permiten números')
-        return
-      }
-    }
-
+    if (fieldType === 'name' && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(newValue)) { setError('Solo letras'); return }
+    if (fieldType === 'phone' && !/^[\d\s+()-]*$/.test(newValue)) { setError('Solo n�meros'); return }
     onChange(newValue)
   }
 
   const handleBlur = () => {
-    // Validación completa al salir del campo
-    if (fieldType === 'email' && value) {
-      // Debe contener @ y terminar en un dominio válido (.com, .co, .net, etc)
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(value)) {
-        setError('Ingresa un correo válido (ej: usuario@empresa.com)')
-      } else if (!value.includes('@')) {
-        setError('El correo debe contener @')
-      } else if (!value.match(/\.[a-zA-Z]{2,}$/)) {
-        setError('El correo debe terminar en un dominio válido')
-      }
-    }
-
-    if (fieldType === 'phone' && value) {
-      const digitsOnly = value.replace(/\D/g, '')
-      if (digitsOnly.length < 10) {
-        setError('Ingresa un teléfono válido (mínimo 10 dígitos)')
-      }
-    }
-
-    if (fieldType === 'name' && value && required) {
-      if (value.trim().length < 3) {
-        setError('Ingresa tu nombre completo')
-      }
-    }
+    setFocused(false)
+    if (fieldType === 'email' && value && !/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value)) setError('Correo invalido')
+    if (fieldType === 'phone' && value && value.replace(/\D/g, '').length < 10) setError('Minimo 10 digitos')
+    if (fieldType === 'name' && value && required && value.trim().length < 3) setError('Nombre completo')
   }
 
+  const underlineColor = error ? 'bg-red-500' : focused ? 'bg-accent' : 'bg-[#253038]'
+
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-        {label} {required && <span className="text-accent">*</span>}
-      </label>
-      <div>
-        <div className="relative">
-          <Icon size={18} className={`absolute left-4 top-4 transition-colors ${
-            error ? 'text-red-500' : 'text-gray-600'
-          }`} />
-          <input
-            type={type}
-            value={value}
-            onChange={e => handleChange(e.target.value)}
-            onBlur={handleBlur}
-            placeholder={placeholder}
-            className={`w-full bg-[#1a1a1a] border text-white placeholder-gray-600
-                       rounded-xl pl-12 pr-4 py-4 text-base
-                       focus:outline-none focus:bg-[#1f1f1f]
-                       transition-all duration-200 ${
-                         error 
-                           ? 'border-red-500 focus:border-red-500' 
-                           : 'border-gray-800 focus:border-accent'
-                       }`}
-          />
-        </div>
-        {error && (
-          <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="text-red-400 text-xs mt-1.5 flex items-center gap-1"
+    <div className="flex flex-col gap-2 group">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-1.5">
+          {label} {required && <span className="text-accent">*</span>}
+        </label>
+        {value && !error && (
+          <motion.span
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-emerald-400"
           >
-            <AlertCircle size={12} />
-            {error}
-          </motion.p>
+            <CheckCircle2 size={12} strokeWidth={2.5} />
+          </motion.span>
         )}
       </div>
+      <div className="relative">
+        <Icon size={14} className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${error ? 'text-red-400' : focused ? 'text-accent' : 'text-zinc-500'}`} />
+        <input
+          type={type}
+          value={value}
+          onChange={e => handleChange(e.target.value)}
+          onBlur={handleBlur}
+          onFocus={() => setFocused(true)}
+          placeholder={placeholder}
+          style={{
+            WebkitBoxShadow: '0 0 0 30px #0b1013 inset',
+            WebkitTextFillColor: '#f4f4f5',
+          }}
+          className="w-full bg-transparent text-zinc-100 placeholder-zinc-600 pl-7 pr-2 py-3 text-base focus:outline-none"
+        />
+        {/* Animated underline */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#1a2129]" />
+        <motion.div
+          className={`absolute bottom-0 left-0 h-px ${underlineColor}`}
+          initial={{ width: '0%' }}
+          animate={{ width: focused || value ? '100%' : '0%' }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        />
+      </div>
+      {error && (
+        <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-400 text-[11px] flex items-center gap-1 font-mono">
+          <AlertCircle size={11} /> {error}
+        </motion.p>
+      )}
     </div>
   )
 }
@@ -139,177 +136,156 @@ function InputField({
 function SelectField({
   icon: Icon, label, value, onChange, options, placeholder, required,
 }: {
-  icon: React.ElementType
-  label: string
-  value: string
-  onChange: (v: string) => void
-  options: string[]
-  placeholder?: string
-  required?: boolean
+  icon: React.ElementType; label: string; value: string; onChange: (v: string) => void
+  options: string[]; placeholder?: string; required?: boolean
 }) {
+  const [focused, setFocused] = useState(false)
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-        {label} {required && <span className="text-accent">*</span>}
-      </label>
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-[0.2em]">
+          {label} {required && <span className="text-accent">*</span>}
+        </label>
+        {value && (
+          <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="text-emerald-400">
+            <CheckCircle2 size={12} strokeWidth={2.5} />
+          </motion.span>
+        )}
+      </div>
       <div className="relative">
-        <Icon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10" />
+        <Icon size={14} className={`absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${focused ? 'text-accent' : 'text-zinc-500'}`} />
         <select
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-[#1a1a1a] border border-gray-800 text-white
-                     rounded-xl pl-12 pr-4 py-4 text-base appearance-none cursor-pointer
-                     focus:outline-none focus:border-accent focus:bg-[#1f1f1f]
-                     transition-all duration-200"
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          className="w-full bg-transparent text-zinc-100 pl-7 pr-6 py-3 text-base appearance-none cursor-pointer focus:outline-none"
         >
-          <option value="" className="text-gray-500">{placeholder}</option>
-          {options.map(o => <option key={o} value={o}>{o}</option>)}
+          <option value="" className="bg-[#0b1013] text-zinc-500">{placeholder}</option>
+          {options.map(o => <option key={o} value={o} className="bg-[#0b1013]">{o}</option>)}
         </select>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+            <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#1a2129]" />
+        <motion.div
+          className={`absolute bottom-0 left-0 h-px ${focused ? 'bg-accent' : 'bg-[#253038]'}`}
+          initial={{ width: '0%' }}
+          animate={{ width: focused || value ? '100%' : '0%' }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        />
       </div>
     </div>
   )
 }
 
-// Indicador de progreso
-function StepIndicator({ step }: { step: BookingStep }) {
-  const steps: { key: BookingStep; label: string }[] = [
-    { key: 'info',     label: 'Información' },
-    { key: 'schedule', label: 'Horario'     },
-    { key: 'confirm',  label: 'Confirmar'   },
-  ]
-  const activeIdx = steps.findIndex(s => s.key === step)
-
-  if (step === 'success') return null
-
-  return (
-    <div className="flex items-center gap-0 mb-8">
-      {steps.map((s, i) => (
-        <div key={s.key} className="flex items-center flex-1">
-          <div className="flex flex-col items-center gap-1">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
-              ${i < activeIdx  ? 'bg-accent text-dark'
-              : i === activeIdx ? 'bg-accent text-dark ring-4 ring-accent/20'
-              : 'bg-dark-border text-gray-500'}`}>
-              {i < activeIdx ? <CheckCircle2 size={14} /> : i + 1}
-            </div>
-            <span className={`text-[11px] md:text-[10px] font-semibold uppercase tracking-wider
-              ${i === activeIdx ? 'text-accent' : 'text-gray-600'}`}>
-              {s.label}
-            </span>
-          </div>
-          {i < steps.length - 1 && (
-            <div className={`h-px flex-1 mx-2 mb-4 transition-all duration-500
-              ${i < activeIdx ? 'bg-accent' : 'bg-dark-border'}`} />
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Pasos ────────────────────────────────────────────────────────────────────
+// ─── Steps ────────────────────────────────────────────────────────────────────
 
 function Step1Info({ form, onChange }: { form: BookingForm; onChange: (field: BookingFormField, value: string) => void }) {
   return (
-    <motion.div
-      key="step1"
-      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.2 }}
-      className="flex flex-col gap-5"
-    >
-      <div className="mb-2">
-        <h3 className="text-xl md:text-2xl font-black text-white">Tu información</h3>
-        <p className="text-gray-500 text-sm md:text-base mt-2">Cuéntanos quién eres para preparar la cita.</p>
+    <motion.div key="step1" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }} className="flex flex-col gap-6">
+      <InputField icon={User} label="Nombre completo" value={form.client_name} onChange={v => onChange('client_name', v)} placeholder="Tu nombre" required fieldType="name" />
+      <InputField icon={Mail} label="Correo" value={form.client_email} onChange={v => onChange('client_email', v)} placeholder="tu@empresa.com" type="email" required fieldType="email" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <InputField icon={Phone} label="Tel�fono" value={form.client_phone} onChange={v => onChange('client_phone', v)} placeholder="+57 300 000 0000" type="tel" fieldType="phone" />
+        <InputField icon={Building2} label="Empresa" value={form.client_company} onChange={v => onChange('client_company', v)} placeholder="Nombre empresa" fieldType="text" />
       </div>
-
-      <InputField icon={User}      label="Nombre completo" value={form.client_name}    onChange={v => onChange('client_name', v)}    placeholder="Juan Pérez"                required fieldType="name" />
-      <InputField icon={Mail}      label="Correo"          value={form.client_email}   onChange={v => onChange('client_email', v)}   placeholder="juan@empresa.com" type="email" required fieldType="email" />
-      <InputField icon={Phone}     label="Teléfono"        value={form.client_phone}   onChange={v => onChange('client_phone', v)}   placeholder="+57 300 000 0000" type="tel" fieldType="phone" />
-      <InputField icon={Building2} label="Empresa"         value={form.client_company} onChange={v => onChange('client_company', v)} placeholder="Mi Empresa S.A." fieldType="text" />
-      <SelectField
-        icon={Briefcase} label="Servicio de interés" value={form.service}
-        onChange={v => onChange('service', v)}
-        options={SERVICES} placeholder="Selecciona un servicio" required
-      />
+      <SelectField icon={Briefcase} label="Servicio de interes" value={form.service} onChange={v => onChange('service', v)} options={SERVICES} placeholder="Selecciona un servicio" required />
     </motion.div>
   )
 }
 
 function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field: BookingFormField, value: string) => void }) {
-  // Mínimo: mañana
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
   const minDate = tomorrow.toISOString().split('T')[0]
 
   return (
-    <motion.div
-      key="step2"
-      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.2 }}
-      className="flex flex-col gap-5"
-    >
-      <div className="mb-2">
-        <h3 className="text-xl md:text-2xl font-black text-white">Elige tu horario</h3>
-        <p className="text-gray-500 text-sm md:text-base mt-2">¿Cuándo te queda mejor para hablar?</p>
-      </div>
-
-      {/* Fecha */}
+    <motion.div key="step2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }} className="flex flex-col gap-6">
+      {/* Date */}
       <div className="flex flex-col gap-2">
-        <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-          Fecha preferida <span className="text-accent">*</span>
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-[0.2em]">Fecha <span className="text-accent">*</span></label>
+          {form.preferred_date && (
+            <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="text-emerald-400">
+              <CheckCircle2 size={12} strokeWidth={2.5} />
+            </motion.span>
+          )}
+        </div>
         <div className="relative">
-          <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+          <Calendar size={14} className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
           <input
             type="date"
             min={minDate}
             value={form.preferred_date}
             onChange={e => onChange('preferred_date', e.target.value)}
-            className="w-full bg-[#1a1a1a] border border-gray-800 text-white
-                       rounded-xl pl-12 pr-4 py-4 text-base
-                       focus:outline-none focus:border-accent focus:bg-[#1f1f1f]
-                       transition-all duration-200 [color-scheme:dark]"
+            className="w-full bg-transparent text-zinc-100 pl-7 pr-4 py-3 text-base focus:outline-none [color-scheme:dark]"
+          />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-[#1a2129]" />
+          <motion.div
+            className="absolute bottom-0 left-0 h-px bg-accent"
+            initial={{ width: '0%' }}
+            animate={{ width: form.preferred_date ? '100%' : '0%' }}
+            transition={{ duration: 0.4 }}
           />
         </div>
       </div>
 
-      {/* Slots de hora */}
-      <div className="flex flex-col gap-2">
-        <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-          <Clock size={13} /> Hora preferida <span className="text-accent">*</span>
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {TIME_SLOTS.map(slot => (
-            <button
-              key={slot}
-              type="button"
-              onClick={() => onChange('preferred_time', slot)}
-              className={`py-3 md:py-3 rounded-xl text-sm font-semibold border transition-all duration-200
-                ${form.preferred_time === slot
-                  ? 'bg-accent text-dark border-accent'
-                  : 'bg-[#1a1a1a] border-gray-800 text-gray-400 hover:border-accent/50 hover:text-white'}`}
-            >
-              {slot}
-            </button>
-          ))}
+      {/* Time slots grid */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-1.5">
+            <Clock size={10} /> Hora <span className="text-accent">*</span>
+          </label>
+          {form.preferred_time && (
+            <span className="text-accent font-mono text-xs font-bold">{form.preferred_time}</span>
+          )}
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          {TIME_SLOTS.map(slot => {
+            const isSelected = form.preferred_time === slot
+            return (
+              <motion.button
+                key={slot}
+                type="button"
+                onClick={() => onChange('preferred_time', slot)}
+                className={`relative py-3 text-xs font-mono font-bold transition-all duration-200 border ${
+                  isSelected
+                    ? 'bg-accent text-[#0b1013] border-accent'
+                    : 'bg-transparent border-[#253038] text-zinc-300 hover:border-accent/50 hover:text-white'
+                }`}
+                whileTap={{ scale: 0.96 }}
+              >
+                {slot}
+                {isSelected && (
+                  <motion.div
+                    layoutId="time-selector"
+                    className="absolute -top-1 -right-1 w-2 h-2 bg-accent"
+                    style={{ boxShadow: '0 0 6px #00C2A8' }}
+                  />
+                )}
+              </motion.button>
+            )
+          })}
         </div>
       </div>
 
-      {/* Mensaje */}
+      {/* Message */}
       <div className="flex flex-col gap-2">
-        <label className="text-xs md:text-[11px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-          <MessageSquare size={13} /> Mensaje (opcional)
+        <label className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-1.5">
+          <MessageSquare size={10} /> Mensaje <span className="text-zinc-600 normal-case tracking-normal font-normal">(opcional)</span>
         </label>
-        <textarea
-          value={form.message}
-          onChange={e => onChange('message', e.target.value)}
-          placeholder="Cuéntanos brevemente sobre tu proyecto..."
-          rows={3}
-          className="w-full bg-[#1a1a1a] border border-gray-800 text-white placeholder-gray-600
-                     rounded-xl px-4 py-4 text-base resize-none
-                     focus:outline-none focus:border-accent focus:bg-[#1f1f1f]
-                     transition-all duration-200"
-        />
+        <div className="relative">
+          <textarea
+            value={form.message}
+            onChange={e => onChange('message', e.target.value)}
+            placeholder="Cu�ntanos brevemente sobre tu proyecto..."
+            rows={3}
+            className="w-full bg-transparent text-zinc-100 placeholder-zinc-600 px-0 py-3 text-base resize-none focus:outline-none border-b border-[#1a2129] focus:border-accent transition-colors"
+          />
+        </div>
       </div>
     </motion.div>
   )
@@ -317,206 +293,406 @@ function Step2Schedule({ form, onChange }: { form: BookingForm; onChange: (field
 
 function Step3Confirm({ form }: { form: BookingForm }) {
   const rows = [
-    { label: 'Nombre',   value: form.client_name },
-    { label: 'Correo',   value: form.client_email },
-    { label: 'Teléfono', value: form.client_phone  || '—' },
-    { label: 'Empresa',  value: form.client_company || '—' },
-    { label: 'Servicio', value: form.service },
-    { label: 'Fecha',    value: form.preferred_date },
-    { label: 'Hora',     value: form.preferred_time },
-    { label: 'Mensaje',  value: form.message || '—' },
+    { label: 'Nombre', value: form.client_name, icon: User },
+    { label: 'Correo', value: form.client_email, icon: Mail },
+    { label: 'Tel�fono', value: form.client_phone || '—', icon: Phone },
+    { label: 'Empresa', value: form.client_company || '—', icon: Building2 },
+    { label: 'Servicio', value: form.service, icon: Briefcase },
   ]
 
   return (
-    <motion.div
-      key="step3"
-      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.2 }}
-      className="flex flex-col gap-5"
-    >
-      <div className="mb-2">
-        <h3 className="text-xl md:text-2xl font-black text-white">Confirma tu cita</h3>
-        <p className="text-gray-500 text-sm md:text-base mt-2">Revisa los datos antes de enviar.</p>
-      </div>
+    <motion.div key="step3" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }} className="flex flex-col gap-6">
+      {/* Reservation card - ticket style */}
+      <div className="relative bg-[#0f1519] border border-[#253038]">
+        {/* Ticket perforation - between top and bottom halves */}
+        <div className="absolute top-[140px] -left-2 w-4 h-4 rounded-full bg-[#0b1013] z-10" />
+        <div className="absolute top-[140px] -right-2 w-4 h-4 rounded-full bg-[#0b1013] z-10" />
 
-      <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl overflow-hidden">
-        {rows.map((r, i) => (
-          <div key={r.label} className={`flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 ${i < rows.length - 1 ? 'border-b border-gray-800' : ''}`}>
-            <span className="text-[11px] text-gray-500 uppercase tracking-wider font-bold sm:w-28 shrink-0">{r.label}</span>
-            <span className="text-sm sm:text-base text-white sm:text-right break-all">{r.value}</span>
+        {/* Top half */}
+        <div className="p-5 pb-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-accent font-mono text-[10px] uppercase tracking-[0.3em] font-bold">
+              RESERVA
+            </span>
+            <span className="text-zinc-600 font-mono text-[10px]">
+              #{String(Date.now()).slice(-6)}
+            </span>
           </div>
-        ))}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-zinc-500 font-mono text-[9px] uppercase tracking-widest block mb-1">
+                Fecha
+              </span>
+              <span className="text-white font-bold text-lg font-mono">
+                {form.preferred_date}
+              </span>
+            </div>
+            <div>
+              <span className="text-zinc-500 font-mono text-[9px] uppercase tracking-widest block mb-1">
+                Hora
+              </span>
+              <span className="text-accent font-bold text-lg font-mono">
+                {form.preferred_time}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom half */}
+        <div className="border-t border-dashed border-[#253038] mx-4" />
+        <div className="p-5 pt-4 space-y-3">
+          {rows.map((r) => {
+            const RowIcon = r.icon
+            return (
+              <div key={r.label} className="flex items-center gap-3">
+                <RowIcon size={12} className="text-accent flex-shrink-0" />
+                <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono font-bold w-16 shrink-0">
+                  {r.label}
+                </span>
+                <span className="text-sm text-zinc-200 text-right flex-1 break-all">
+                  {r.value}
+                </span>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
-      <p className="text-xs text-gray-600 text-center leading-relaxed">
-        Al confirmar, recibiremos tu solicitud y nos pondremos en contacto a la brevedad.
-      </p>
+      {form.message && (
+        <div className="bg-[#0f1519] border-l-2 border-accent p-4">
+          <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono font-bold block mb-2">Mensaje</span>
+          <p className="text-sm text-zinc-200 leading-relaxed">{form.message}</p>
+        </div>
+      )}
     </motion.div>
   )
 }
 
 function StepSuccess({ onClose, form }: { onClose: () => void; form: BookingForm }) {
   return (
-    <motion.div
-      key="success"
-      initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex flex-col items-center text-center gap-6 py-8"
-    >
+    <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }} className="flex flex-col items-center text-center gap-6 py-6">
       <motion.div
-        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        initial={{ scale: 0, rotate: -90 }}
+        animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-        className="w-20 h-20 rounded-full bg-accent/10 border-2 border-accent flex items-center justify-center"
+        className="relative w-24 h-24 flex items-center justify-center"
       >
-        <CheckCircle2 size={40} className="text-accent" />
+        <div className="absolute inset-0 bg-accent/10 border-2 border-accent" />
+        <motion.div
+          className="absolute inset-0 border-2 border-accent"
+          animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
+          transition={{ duration: 2.5, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute inset-0 border-2 border-accent"
+          animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0, 0.3] }}
+          transition={{ duration: 2.5, repeat: Infinity, delay: 0.4 }}
+        />
+        <CheckCircle2 size={42} className="text-accent relative z-10" strokeWidth={1.5} />
       </motion.div>
 
       <div>
-        <h3 className="text-xl md:text-2xl font-black text-white">¡Solicitud enviada!</h3>
-        <p className="text-gray-400 text-sm mt-2 max-w-xs mx-auto leading-relaxed">
-          Hemos recibido tu solicitud, <span className="text-white font-semibold">{form.client_name.split(' ')[0]}</span>. Nos comunicaremos contigo pronto para confirmar tu cita.
+        <span className="text-emerald-400 font-mono text-[10px] uppercase tracking-[0.3em] mb-3 block font-bold">
+          /solicitud.enviada
+        </span>
+        <h3 className="text-3xl md:text-4xl font-black text-white tracking-tighter leading-[0.95]">
+          Todo listo,
+          <br />
+          <span className="text-accent">{form.client_name.split(' ')[0]}</span>
+        </h3>
+        <p className="text-zinc-400 text-sm mt-4 max-w-sm mx-auto leading-relaxed">
+          Recibimos tu solicitud. Te contactaremos en menos de 24 horas para confirmar los detalles.
         </p>
       </div>
 
-      <div className="bg-dark-card border border-dark-border rounded-2xl px-6 py-4 w-full text-left">
-        <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">Resumen</p>
-        <p className="text-sm text-white">{form.service}</p>
-        <p className="text-xs text-accent mt-0.5">{form.preferred_date} · {form.preferred_time}</p>
+      <div className="w-full bg-[#0f1519] border-l-2 border-accent px-5 py-4 text-left">
+        <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-mono font-bold mb-2">Tu cita</p>
+        <p className="text-white font-medium text-sm mb-1">{form.service}</p>
+        <p className="text-accent font-mono text-sm">{form.preferred_date} &middot; {form.preferred_time}</p>
       </div>
 
-      <button
-        onClick={onClose}
-        className="w-full bg-accent text-dark font-bold py-3.5 rounded-xl text-sm uppercase tracking-widest
-                   hover:bg-accent/90 transition-all duration-200 active:scale-95"
-      >
+      <button onClick={onClose} className="w-full bg-accent text-[#0b1013] font-bold py-4 text-xs uppercase tracking-[0.2em] hover:bg-accent-dim transition-all duration-200 active:scale-[0.98]">
         Cerrar
       </button>
     </motion.div>
   )
 }
 
-// ─── Modal principal ──────────────────────────────────────────────────────────
+// ─── Main Modal ───────────────────────────────────────────────────────────────
 
 export default function BookingModal({
-  isOpen, onClose, step,
-  form, onFieldChange,
-  onNext, onBack, onSubmit,
-  isStep1Valid, isStep2Valid,
-  loading, error,
+  isOpen, onClose, step, form, onFieldChange,
+  onNext, onBack, onSubmit, isStep1Valid, isStep2Valid, loading, error,
 }: BookingModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
 
-  // Cerrar con Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
   }, [onClose])
 
-  // Bloquear scroll del body
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
   const canGoNext = step === 'info' ? isStep1Valid : step === 'schedule' ? isStep2Valid : true
+  const isSuccess = step === 'success'
+  const currentConfig = !isSuccess ? STEP_CONFIG[step] : null
+
+  const activeStepIndex = step === 'info' ? 0 : step === 'schedule' ? 1 : step === 'confirm' ? 2 : 3
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           ref={overlayRef}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={e => { if (e.target === overlayRef.current) onClose() }}
         >
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          {/* Backdrop with animated noise */}
+          <div className="absolute inset-0 bg-[#050709]/95 backdrop-blur-xl" />
 
-          {/* Panel */}
+          {/* Modal container - expansive split layout */}
           <motion.div
-            className="relative z-10 w-full max-w-lg bg-dark border border-dark-border rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0,  scale: 1    }}
-            exit={{   opacity: 0, y: 20, scale: 0.95  }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 w-full max-w-6xl h-full md:h-[90vh] md:max-h-[800px] bg-[#0b1013] border border-[#253038] shadow-2xl overflow-hidden flex flex-col md:flex-row"
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.96 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Accent top line */}
-            <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent" />
 
-            {/* Header */}
-            <div className="flex items-start justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
-              <div>
-                <p className="text-accent text-xs font-bold uppercase tracking-widest">Versat</p>
-                <h2 className="text-base sm:text-lg font-black text-white mt-0.5">Agendar cita</h2>
+            {/* ═══ LEFT PANEL — Branding + Timeline ═══ */}
+            <div className="relative w-full md:w-[40%] bg-[#080c0f] border-b md:border-b-0 md:border-r border-[#1a2129] flex flex-col overflow-hidden">
+              {/* Ambient teal glow */}
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-accent/[0.06] rounded-full blur-[80px] pointer-events-none will-change-transform" />
+              <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-500/[0.03] rounded-full blur-[80px] pointer-events-none will-change-transform" />
+
+              {/* Grid pattern */}
+              <div className="absolute inset-0 opacity-[0.03]" style={{
+                backgroundImage: 'linear-gradient(to right, #00C2A8 1px, transparent 1px), linear-gradient(to bottom, #00C2A8 1px, transparent 1px)',
+                backgroundSize: '48px 48px'
+              }} />
+
+              {/* Corner frame */}
+              <div className="absolute top-6 left-6 w-8 h-8 border-t border-l border-accent/30 pointer-events-none" />
+
+              {/* Top bar - brand */}
+              <div className="relative z-10 p-6 md:p-8 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <motion.span
+                    className="w-1.5 h-1.5 rounded-full bg-accent"
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    style={{ boxShadow: '0 0 6px #00C2A8' }}
+                  />
+                  <span className="text-accent font-mono text-[10px] uppercase tracking-[0.3em] font-bold">
+                    VERSAT / BOOKING
+                  </span>
+                </div>
               </div>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-white transition-colors p-1.5 hover:bg-dark-border rounded-lg"
-              >
-                <X size={20} />
-              </button>
+
+              {/* Center content - step narrative */}
+              <div className="relative z-10 flex-1 flex flex-col justify-center px-6 md:px-8 pb-6 md:pb-8">
+                <AnimatePresence mode="wait">
+                  {currentConfig ? (
+                    <motion.div
+                      key={step}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      {/* Massive step number */}
+                      <div className="relative mb-6 md:mb-10">
+                        <span
+                          className="block text-[6rem] md:text-[10rem] font-black leading-[0.8] tracking-tighter text-transparent select-none pointer-events-none"
+                          style={{ WebkitTextStroke: '1px rgba(0, 194, 168, 0.25)' }}
+                        >
+                          {currentConfig.num}
+                        </span>
+                        <motion.div
+                          className="absolute top-1/2 left-0 h-px bg-accent"
+                          initial={{ width: 0 }}
+                          animate={{ width: '40px' }}
+                          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        />
+                      </div>
+
+                      {/* Kicker */}
+                      <span className="text-accent font-mono text-[10px] uppercase tracking-[0.3em] mb-3 block">
+                        {currentConfig.kicker}
+                      </span>
+
+                      {/* Title - editorial large */}
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9] mb-4">
+                        {currentConfig.title}
+                        <br />
+                        <span className="text-zinc-500">{currentConfig.highlight}</span>
+                      </h2>
+
+                      <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-sm">
+                        {currentConfig.subtitle}
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="success-side"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <span className="text-emerald-400 font-mono text-[10px] uppercase tracking-[0.3em] mb-3 block">
+                        /completado
+                      </span>
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9]">
+                        Enviado
+                        <br />
+                        <span className="text-zinc-500">con exito</span>
+                      </h2>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Bottom - Timeline + meta */}
+              <div className="relative z-10 p-6 md:p-8 border-t border-[#1a2129] space-y-5">
+                {/* Vertical step timeline */}
+                {!isSuccess && (
+                  <div className="space-y-3">
+                    {(['info', 'schedule', 'confirm'] as const).map((s, i) => {
+                      const config = STEP_CONFIG[s]
+                      const isActive = activeStepIndex === i
+                      const isDone = activeStepIndex > i
+                      return (
+                        <div key={s} className="flex items-center gap-3">
+                          <motion.div
+                            className={`w-5 h-5 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                              isDone ? 'bg-accent text-[#0b1013]' :
+                              isActive ? 'bg-accent text-[#0b1013]' :
+                              'bg-[#0b1013] border border-[#253038] text-zinc-500'
+                            }`}
+                            animate={{ scale: isActive ? 1.1 : 1 }}
+                          >
+                            {isDone ? (
+                              <CheckCircle2 size={11} strokeWidth={2.5} />
+                            ) : (
+                              <span className="text-[9px] font-mono font-bold">{config.num}</span>
+                            )}
+                          </motion.div>
+                          <div className="flex-1 flex items-center gap-3">
+                            <div className={`h-px flex-1 transition-colors duration-300 ${
+                              isDone ? 'bg-accent' : 'bg-[#253038]'
+                            }`} />
+                            <span className={`text-[10px] font-mono uppercase tracking-widest transition-colors duration-300 ${
+                              isActive ? 'text-accent font-bold' :
+                              isDone ? 'text-zinc-400' :
+                              'text-zinc-600'
+                            }`}>
+                              {s === 'info' ? 'Info' : s === 'schedule' ? 'Horario' : 'Confirmar'}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Location meta */}
+                <div className="flex items-center gap-2 text-zinc-600 font-mono text-[9px] uppercase tracking-widest pt-4 border-t border-[#1a2129]">
+                  <MapPin size={10} />
+                  <span>Medellin &middot; Colombia</span>
+                  <span className="ml-auto text-accent">v.2026</span>
+                </div>
+              </div>
+
+              {/* Corner frame bottom */}
+              <div className="absolute bottom-6 right-6 w-8 h-8 border-b border-r border-accent/30 pointer-events-none" />
             </div>
 
-            {/* Body */}
-            <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 overflow-y-auto flex-1">
-              <StepIndicator step={step} />
+            {/* ═══ RIGHT PANEL — Form ═══ */}
+            <div className="relative flex-1 flex flex-col overflow-hidden">
+              {/* Accent bar */}
+              <div className="h-0.5 w-full bg-accent" />
 
-              <AnimatePresence mode="wait">
-                {step === 'info'     && <Step1Info     form={form} onChange={onFieldChange} />}
-                {step === 'schedule' && <Step2Schedule form={form} onChange={onFieldChange} />}
-                {step === 'confirm'  && <Step3Confirm  form={form} />}
-                {step === 'success'  && <StepSuccess   form={form} onClose={onClose} />}
-              </AnimatePresence>
+              {/* Close button */}
+              <button
+                onClick={onClose}
+                className="absolute top-6 right-6 z-20 w-10 h-10 border border-[#253038] text-zinc-400 hover:text-white hover:border-accent/50 transition-colors flex items-center justify-center"
+                aria-label="Cerrar"
+              >
+                <X size={16} />
+              </button>
 
-              {/* Error */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3"
-                >
-                  <AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" />
-                  <p className="text-red-400 text-sm">{error}</p>
-                </motion.div>
-              )}
+              {/* Form content */}
+              <div className="flex-1 overflow-y-auto px-6 md:px-10 py-8 md:py-12">
+                <AnimatePresence mode="wait">
+                  {step === 'info' && <Step1Info form={form} onChange={onFieldChange} />}
+                  {step === 'schedule' && <Step2Schedule form={form} onChange={onFieldChange} />}
+                  {step === 'confirm' && <Step3Confirm form={form} />}
+                  {step === 'success' && <StepSuccess form={form} onClose={onClose} />}
+                </AnimatePresence>
 
-              {/* Footer de navegación */}
-              {step !== 'success' && (
-                <div className="flex gap-2 sm:gap-3 mt-6">
-                  {(step === 'schedule' || step === 'confirm') && (
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-6 flex items-start gap-3 bg-red-500/10 border-l-2 border-red-500 px-4 py-3"
+                  >
+                    <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                    <p className="text-red-400 text-sm">{error}</p>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Navigation bar */}
+              {!isSuccess && (
+                <div className="border-t border-[#1a2129] bg-[#0b1013] px-6 md:px-10 py-5 flex items-center justify-between gap-3">
+                  {(step === 'schedule' || step === 'confirm') ? (
                     <button
                       onClick={onBack}
-                      className="flex items-center gap-2 px-4 sm:px-5 py-3 rounded-xl border border-dark-border text-gray-400
-                                 hover:text-white hover:border-gray-500 transition-all duration-200 text-sm font-semibold"
+                      className="flex items-center gap-2 px-4 py-3 text-zinc-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-[0.2em]"
                     >
-                      <ArrowLeft size={16} /> <span className="hidden sm:inline">Atrás</span>
+                      <ArrowLeft size={14} />
+                      <span>Atras</span>
                     </button>
+                  ) : (
+                    <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest">
+                      Paso {activeStepIndex + 1} de 3
+                    </span>
                   )}
 
                   {step !== 'confirm' ? (
-                    <button
+                    <motion.button
                       onClick={onNext}
                       disabled={!canGoNext}
-                      className="flex-1 flex items-center justify-center gap-2 bg-accent text-dark font-bold
-                                 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-widest
-                                 hover:bg-accent/90 transition-all duration-200 active:scale-[0.98]
-                                 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="group flex items-center gap-3 bg-accent text-[#0b1013] font-bold px-8 py-4 text-xs uppercase tracking-[0.2em] hover:bg-accent-dim transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent"
+                      whileHover={{ x: 4 }}
                     >
-                      Continuar <ArrowRight size={16} />
-                    </button>
+                      <span>Continuar</span>
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
                   ) : (
-                    <button
+                    <motion.button
                       onClick={onSubmit}
                       disabled={loading}
-                      className="flex-1 flex items-center justify-center gap-2 bg-accent text-dark font-bold
-                                 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-widest
-                                 hover:bg-accent/90 transition-all duration-200 active:scale-[0.98]
-                                 disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="group flex items-center gap-3 bg-accent text-[#0b1013] font-bold px-8 py-4 text-xs uppercase tracking-[0.2em] hover:bg-accent-dim transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                      whileHover={{ x: 4 }}
                     >
-                      {loading
-                        ? <><Loader2 size={16} className="animate-spin" /> Enviando...</>
-                        : <><CheckCircle2 size={16} /> Confirmar cita</>}
-                    </button>
+                      {loading ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>Enviando</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Confirmar cita</span>
+                          <CheckCircle2 size={14} />
+                        </>
+                      )}
+                    </motion.button>
                   )}
                 </div>
               )}
@@ -527,3 +703,5 @@ export default function BookingModal({
     </AnimatePresence>
   )
 }
+
+

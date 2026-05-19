@@ -1,9 +1,8 @@
-import { motion } from 'framer-motion'
-import { Monitor, Settings, Zap, BarChart, Database, ShoppingBag, ArrowUpRight } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { ShoppingBag, Users, Zap, Bot, Ticket, BarChart } from 'lucide-react'
 import { VERSAT_FEATURES } from '../../lib/versat.constants'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
-// Importar las imágenes disponibles
 import imgAutomatizacion from '../../assets/images/automatizacion.png'
 import imgConsultoria from '../../assets/images/consultoria.png'
 import imgAnalisisDatos from '../../assets/images/analisis.png'
@@ -12,7 +11,7 @@ import imgSistemasMedida from '../../assets/images/medida.png'
 import imgRetail from '../../assets/images/retail.png'
 
 const ICONS: Record<string, React.ElementType> = {
-  Monitor, Settings, Zap, BarChart, Database, ShoppingBag,
+  ShoppingBag, Users, Zap, Bot, Ticket, BarChart,
 }
 
 const FEATURE_IMAGES: Record<string, string> = {
@@ -25,139 +24,320 @@ const FEATURE_IMAGES: Record<string, string> = {
 }
 
 export default function VersatFeatures() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [expanded, setExpanded] = useState(0)
+  const [mobileActive, setMobileActive] = useState(0)
+  const sectionRef = useRef<HTMLDivElement>(null)
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start start"]
+  })
+
+  const clipPath = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ['inset(10% 5% 10% 5% round 2rem)', 'inset(0% 0% 0% 0% round 0rem)']
+  )
+
+  // On mobile, skip the clip-path effect
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   return (
-    <section id="servicios" className="bg-dark py-24 px-6">
-      <div className="max-w-7xl mx-auto">
-
-        {/* Encabezado */}
-        <div className="text-center mb-14">
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-accent text-sm font-semibold uppercase tracking-widest inline-block"
-          >
-            Nuestros servicios
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+    <section ref={sectionRef} id="servicios" className="relative">
+      {/* Clip-path reveal transition - desktop only */}
+      <motion.div style={isMobile ? undefined : { clipPath }} className="bg-surface-tinted">
+        {/* Header */}
+        <div className="px-6 md:px-12 lg:px-20 pt-12 md:pt-20 pb-10 md:pb-12 max-w-[1400px] mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-4xl md:text-5xl font-black text-white mt-3 mb-4"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            Todo lo que tu empresa necesita
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-gray-400 max-w-xl mx-auto text-lg"
-          >
-            Soluciones completas para llevar tu negocio al siguiente nivel.
-          </motion.p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+              <div>
+                <span className="text-accent font-mono text-[11px] uppercase tracking-[0.3em] mb-4 block">
+                  /soluciones
+                </span>
+                <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] text-white">
+                  Todo lo que tu negocio
+                  <br />
+                  <span className="text-accent">necesita.</span>
+                </h2>
+              </div>
+              <div className="md:text-right">
+                <p className="text-zinc-300 text-lg leading-relaxed max-w-md md:ml-auto mb-4">
+                  Seis soluciones pensadas para cómo opera un negocio de verdad. Cada una conecta con las demás.
+                </p>
+                <div className="inline-flex items-center gap-2 text-accent font-mono text-[10px] uppercase tracking-widest">
+                  <span className="w-4 h-px bg-accent" />
+                  <span>todo a medida</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Grid de cards - 2 por fila */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 max-w-6xl mx-auto">
-          {VERSAT_FEATURES.map((feature, index) => {
-            const Icon = ICONS[feature.icon]
-            const isHovered = hoveredIndex === index
-            const bgImage = FEATURE_IMAGES[feature.image]
+        {/* ACCORDION IMAGE STRIPS - Desktop */}
+        <div className="hidden md:block">
+          <div className="flex h-[85vh] min-h-[600px]">
+            {VERSAT_FEATURES.map((feature, index) => {
+              const Icon = ICONS[feature.icon]
+              const isExpanded = expanded === index
+              const image = FEATURE_IMAGES[feature.image]
 
-            return (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                className="relative bg-dark-card border border-dark-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 group hover:shadow-xl hover:shadow-accent/10 aspect-[16/10] md:aspect-[16/9]"
-              >
-                {/* Imagen de fondo - visible en móvil con opacidad baja, full en hover desktop */}
-                {bgImage && (
-                  <div
-                    className={`absolute inset-0 transition-all duration-500 ${
-                      isHovered ? 'opacity-100' : 'opacity-30 md:opacity-0'
-                    }`}
+              return (
+                <motion.div
+                  key={feature.title}
+                  className="relative cursor-pointer overflow-hidden border-r border-surface-border last:border-r-0"
+                  animate={{
+                    flex: isExpanded ? 5 : 1,
+                  }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  onMouseEnter={() => setExpanded(index)}
+                >
+                  {/* Background image */}
+                  <motion.div
+                    className="absolute inset-0"
+                    animate={{ scale: isExpanded ? 1 : 1.1 }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <img 
-                      src={bgImage} 
+                    <img
+                      src={image}
                       alt={feature.title}
-                      className="absolute inset-0 w-full h-full object-cover object-center"
+                      className="w-full h-full object-cover"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/60" />
-                  </div>
-                )}
+                  </motion.div>
 
-                {/* Gradiente de fondo para cards sin imagen */}
-                {!bgImage && (
-                  <div
-                    className={`absolute inset-0 transition-opacity duration-300 ${
-                      isHovered ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent/15 via-accent/5 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-dark-card/95 via-dark-card/60 to-transparent" />
-                  </div>
-                )}
+                  {/* Overlay gradient */}
+                  <motion.div
+                    className="absolute inset-0"
+                    animate={{
+                      background: isExpanded
+                        ? 'linear-gradient(to top, rgba(11,16,19,0.92) 0%, rgba(11,16,19,0.3) 55%, rgba(11,16,19,0.1) 100%)'
+                        : 'linear-gradient(to top, rgba(11,16,19,0.96) 0%, rgba(11,16,19,0.82) 50%, rgba(11,16,19,0.72) 100%)'
+                    }}
+                    transition={{ duration: 0.5 }}
+                  />
 
-                {/* Borde teal en hover */}
-                <div
-                  className={`absolute inset-0 rounded-2xl border-2 border-accent transition-opacity duration-200 pointer-events-none ${
-                    isHovered ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-
-                {/* Contenido */}
-                <div className="relative z-20 p-6 md:p-8 h-full flex flex-col justify-between">
-
-                  <div className="flex flex-col gap-3 md:gap-4">
-                    {/* Ícono */}
-                    <div
-                      className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                        isHovered ? 'bg-accent/40 scale-105' : 'bg-accent/20'
-                      }`}
-                    >
-                      <Icon size={20} className="text-accent drop-shadow-lg md:w-6 md:h-6" />
+                  {/* Content */}
+                  <div className="relative z-10 h-full flex flex-col justify-between p-6 lg:p-8">
+                    {/* Top - Number */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-accent font-mono text-xs">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <motion.div
+                        animate={{ rotate: isExpanded ? 0 : 90 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <Icon className="w-5 h-5 text-accent" strokeWidth={1.5} />
+                      </motion.div>
                     </div>
 
-                    {/* Texto */}
+                    {/* Bottom - Info */}
                     <div>
-                      <h3 className="text-white font-black text-xl md:text-2xl lg:text-3xl mb-2 md:mb-3 leading-tight drop-shadow-lg uppercase tracking-tight">
+                      {/* Tag - visible when expanded */}
+                      <motion.div
+                        className="mb-3"
+                        animate={{
+                          opacity: isExpanded ? 1 : 0,
+                          y: isExpanded ? 0 : 10,
+                        }}
+                        transition={{ duration: 0.4, delay: isExpanded ? 0.15 : 0 }}
+                      >
+                        <span className="inline-flex items-center gap-2 text-accent font-mono text-[10px] uppercase tracking-[0.2em]">
+                          <span className="w-3 h-px bg-accent" />
+                          {(feature as typeof feature & { tag: string }).tag}
+                        </span>
+                      </motion.div>
+
+                      <motion.h3
+                        className="text-white font-black tracking-tight origin-bottom-left"
+                        animate={{
+                          fontSize: isExpanded ? '2.5rem' : '1rem',
+                          writingMode: isExpanded ? 'horizontal-tb' : 'vertical-rl',
+                          rotate: isExpanded ? 0 : 180,
+                        }}
+                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      >
                         {feature.title}
-                      </h3>
-                      <p className={`text-sm md:text-base lg:text-lg leading-relaxed transition-colors duration-300 ${
-                        isHovered ? 'text-gray-200' : 'text-gray-400'
-                      }`}>
+                      </motion.h3>
+
+                      <motion.p
+                        className="text-zinc-200 text-base leading-relaxed mt-4 max-w-md"
+                        animate={{
+                          opacity: isExpanded ? 1 : 0,
+                          y: isExpanded ? 0 : 20,
+                        }}
+                        transition={{ duration: 0.5, delay: isExpanded ? 0.2 : 0 }}
+                      >
                         {feature.description}
-                      </p>
+                      </motion.p>
+
+                      <motion.div
+                        className="h-px bg-accent mt-6"
+                        animate={{ width: isExpanded ? '100px' : '0px' }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                      />
                     </div>
                   </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
 
-                  {/* CTA — aparece en hover */}
-                  <div
-                    className={`flex items-center gap-2 text-accent font-semibold text-sm transition-all duration-300 drop-shadow-lg ${
-                      isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-3'
-                    }`}
-                  >
-                    Ver más
-                    <ArrowUpRight size={16} />
-                  </div>
-                </div>
-              </motion.div>
+        {/* MOBILE - Scroll-driven accordion: item closest to viewport center is active */}
+        <div className="md:hidden">
+          {VERSAT_FEATURES.map((feature, index) => {
+            const Icon = ICONS[feature.icon]
+            const image = FEATURE_IMAGES[feature.image]
+            return (
+              <MobileAccordionItem
+                key={feature.title}
+                feature={feature}
+                index={index}
+                Icon={Icon}
+                image={image}
+                isActive={mobileActive === index}
+                onActivate={() => setMobileActive(index)}
+                onScrollDetect={(idx) => {
+                  setMobileActive((prev) => (prev === idx ? prev : idx))
+                }}
+              />
             )
           })}
         </div>
-
-      </div>
+      </motion.div>
     </section>
+  )
+}
+
+function MobileAccordionItem({
+  feature,
+  index,
+  Icon,
+  image,
+  isActive,
+  onActivate,
+  onScrollDetect,
+}: {
+  feature: typeof VERSAT_FEATURES[0]
+  index: number
+  Icon: React.ElementType
+  image: string
+  isActive: boolean
+  onActivate: () => void
+  onScrollDetect: (index: number) => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Scroll-driven: the item whose center is closest to viewport's 40% line becomes active.
+  // Using a single rAF-throttled scroll listener prevents the toggle bug.
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+
+    let ticking = false
+    const TRIGGER_LINE_RATIO = 0.4 // 40% from top of viewport
+
+    const check = () => {
+      ticking = false
+      const triggerY = window.innerHeight * TRIGGER_LINE_RATIO
+      const rect = node.getBoundingClientRect()
+      // Item is active when the trigger line passes through it
+      if (rect.top <= triggerY && rect.bottom >= triggerY) {
+        onScrollDetect(index)
+      }
+    }
+
+    const handleScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(check)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    check() // initial check
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [index, onScrollDetect])
+
+  return (
+    <motion.div
+      ref={ref}
+      onClick={onActivate}
+      className="relative overflow-hidden border-b border-surface-border cursor-pointer"
+      animate={{ height: isActive ? 340 : 64 }}
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Background image - fades only when active */}
+      <motion.div
+        className="absolute inset-0"
+        animate={{ opacity: isActive ? 1 : 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
+        <img
+          src={image}
+          alt={feature.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1013] via-[#0b1013]/80 to-[#0b1013]/30" />
+      </motion.div>
+
+      {/* Collapsed bar */}
+      <motion.div
+        className="absolute inset-x-0 top-0 h-16 flex items-center px-5 gap-4 z-10"
+        animate={{ opacity: isActive ? 0 : 1 }}
+        transition={{ duration: 0.25 }}
+        style={{ pointerEvents: isActive ? 'none' : 'auto' }}
+      >
+        <span className="text-accent font-mono text-[10px] font-bold w-6">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <div className="h-px flex-1 bg-surface-border" />
+        <span className="text-zinc-200 text-sm font-bold tracking-tight whitespace-nowrap">
+          {feature.title}
+        </span>
+        <Icon className="w-4 h-4 text-accent/60 flex-shrink-0" strokeWidth={1.5} />
+      </motion.div>
+
+      {/* Expanded content */}
+      <motion.div
+        className="relative z-10 h-full flex flex-col justify-end p-5"
+        animate={{ opacity: isActive ? 1 : 0 }}
+        transition={{ duration: 0.35, delay: isActive ? 0.15 : 0 }}
+        style={{ pointerEvents: isActive ? 'auto' : 'none' }}
+      >
+        <div className="absolute top-4 left-5 right-5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-accent font-mono text-[10px] font-bold">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <div className="w-6 h-px bg-accent/40" />
+          </div>
+          <div className="w-8 h-8 border border-accent/30 flex items-center justify-center">
+            <Icon className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 mb-2">
+          <span className="w-3 h-px bg-accent" />
+          <span className="text-accent font-mono text-[9px] uppercase tracking-[0.2em]">
+            {(feature as typeof feature & { tag: string }).tag}
+          </span>
+        </div>
+
+        <h3 className="text-2xl font-black text-white tracking-tight leading-tight mb-2">
+          {feature.title}
+        </h3>
+
+        <p className="text-zinc-200 text-sm leading-relaxed">
+          {feature.description}
+        </p>
+      </motion.div>
+    </motion.div>
   )
 }

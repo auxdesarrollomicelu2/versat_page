@@ -1,70 +1,154 @@
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 import centrojapon from '../../assets/images/centrojapon.png'
 import logoEH from '../../assets/images/logoEH.png'
 import micelu from '../../assets/images/micelu1.png'
 import lampert from '../../assets/images/lampert.png'
+import sirius from '../../assets/images/sirius.png'
 
 const CLIENTS = [
-  { name: 'Centro Japón', logo: centrojapon },
-  { name: 'Micelu', logo: micelu },
-  { name: 'Lampert', logo: lampert },
-  { name: 'El Hueco', logo: logoEH },
+  { name: 'Somos El Hueco', industry: 'E-commerce',          logo: logoEH },
+  { name: 'Micelu',         industry: 'Intranet Empresarial', logo: micelu },
+  { name: 'Centro Japón',   industry: 'Cultura',              logo: centrojapon },
+  { name: 'Lampert',        industry: 'Industria',            logo: lampert },
+  { name: 'Sirius',         industry: 'Perfumería',           logo: sirius },
 ]
 
+// Two identical copies = perfect seamless loop (animating 0 → -50% lands exactly back to start)
+const ROW_1 = [...CLIENTS, ...CLIENTS]
+const ROW_2 = [...CLIENTS.slice().reverse(), ...CLIENTS.slice().reverse()]
+
 export default function VersatClients() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
+
+  // Section title scroll parallax
+  const titleX = useTransform(scrollYProgress, [0, 1], ['0%', '-15%'])
+
   return (
-    <section className="bg-dark py-16 px-6 relative">
-      {/* Fondo uniforme */}
-      <div className="absolute inset-0 bg-dark" />
-      
-      <div className="max-w-7xl mx-auto relative z-10">
-        
+    <section ref={sectionRef} className="relative bg-surface py-8 md:py-12 overflow-hidden">
+      {/* Background giant text - scroll driven */}
+      <motion.div
+        className="absolute inset-0 flex items-center pointer-events-none select-none opacity-[0.025] overflow-hidden"
+        style={{ x: titleX }}
+      >
+        <span className="text-[10rem] md:text-[16rem] font-black whitespace-nowrap text-white tracking-tighter leading-none">
+          PARTNERS &middot; PARTNERS &middot; PARTNERS &middot; PARTNERS
+        </span>
+      </motion.div>
+
+      <div className="relative z-10">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-14 md:mb-16"
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8"
         >
-          <span className="text-gray-400 text-sm md:text-base font-semibold uppercase tracking-widest">
-            Confían en nosotros
-          </span>
+          <div>
+            <span className="text-accent font-mono text-[11px] uppercase tracking-[0.3em] mb-4 block">
+              /clientes
+            </span>
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] text-white">
+              Empresas que
+              <br />
+              <span className="text-zinc-500">construyen con nosotros</span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-accent font-mono text-4xl md:text-5xl font-black">
+              {String(CLIENTS.length).padStart(2, '0')}
+            </span>
+            <div className="flex flex-col">
+              <span className="text-zinc-300 font-mono text-xs uppercase tracking-widest">
+                partners
+              </span>
+              <span className="text-zinc-500 font-mono text-[10px]">activos</span>
+            </div>
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 items-center justify-items-center">
-          {CLIENTS.map((client, index) => (
-            <motion.div
-              key={client.name}
-              initial={{ opacity: 0, y: 30, scale: 0.7 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ 
-                delay: index * 0.15,
-                duration: 0.6,
-                type: "spring",
-                stiffness: 80,
-                damping: 12
-              }}
-              whileHover={{ 
-                scale: 1.05, 
-                y: -3,
-                transition: { duration: 0.2, type: "spring", stiffness: 300 }
-              }}
-              className="relative group cursor-pointer"
-            >
-              {/* Glow effect en hover - suave */}
-              <div className="absolute inset-0 bg-accent/10 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 rounded-full scale-150" />
-              
-              <img 
-                src={client.logo} 
-                alt={client.name}
-                className="h-16 md:h-20 lg:h-24 w-auto object-contain opacity-70 group-hover:opacity-100 transition-all duration-300 relative z-10 filter drop-shadow-2xl"
-                loading="lazy"
-              />
-            </motion.div>
-          ))}
+        {/* Marquee strips - full bleed */}
+        <div className="space-y-2 md:space-y-3">
+          <MarqueeRow logos={ROW_1} duration={20} direction="left" />
+          <MarqueeRow logos={ROW_2} duration={25} direction="right" />
+        </div>
+
+        {/* Bottom line */}
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 mt-8">
+          <div className="h-px bg-gradient-to-r from-surface-border via-surface-border to-transparent" />
         </div>
       </div>
     </section>
+  )
+}
+
+function MarqueeRow({
+  logos,
+  duration,
+  direction,
+}: {
+  logos: typeof CLIENTS
+  duration: number
+  direction: 'left' | 'right'
+}) {
+  return (
+    <div className="relative overflow-hidden border-y border-surface-border bg-surface-tinted/40">
+      {/* Fade edges */}
+      <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-surface to-transparent z-10 pointer-events-none" />
+
+      <motion.div
+        className="flex items-center w-max"
+        animate={{
+          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
+        }}
+        transition={{
+          duration,
+          repeat: Infinity,
+          ease: 'linear',
+        }}
+      >
+        {logos.map((client, i) => (
+          <LogoCell key={`${client.name}-${i}`} client={client} />
+        ))}
+      </motion.div>
+    </div>
+  )
+}
+
+function LogoCell({ client }: { client: typeof CLIENTS[0] }) {
+  return (
+    <div className="group relative shrink-0 px-12 md:px-20 py-8 md:py-12 flex items-center gap-6 border-r border-surface-border min-w-[280px] md:min-w-[360px] hover:bg-surface-raised/40 transition-colors duration-500">
+      {/* Logo */}
+      <div className="w-24 md:w-32 h-16 md:h-20 flex items-center justify-center flex-shrink-0">
+        <img
+          src={client.logo}
+          alt={client.name}
+          className="max-h-full max-w-full object-contain opacity-50 group-hover:opacity-100 filter grayscale group-hover:grayscale-0 transition-all duration-500"
+          loading="lazy"
+        />
+      </div>
+
+      {/* Vertical divider */}
+      <div className="w-px h-10 bg-surface-border" />
+
+      {/* Meta info */}
+      <div className="flex flex-col gap-1">
+        <span className="text-white text-base md:text-lg font-bold tracking-tight whitespace-nowrap leading-none">
+          {client.name}
+        </span>
+        <span className="text-accent font-mono text-[10px] uppercase tracking-widest whitespace-nowrap">
+          {client.industry}
+        </span>
+      </div>
+
+      {/* Hover accent corner */}
+      <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-accent/0 group-hover:border-accent/50 transition-colors duration-500" />
+    </div>
   )
 }

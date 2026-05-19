@@ -1,77 +1,97 @@
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { VERSAT_STATS } from '../../lib/versat.constants'
+import { useRef } from 'react'
 
 export default function VersatStats() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  })
+
+  const marqueeX = useTransform(scrollYProgress, [0, 1], ['0%', '-30%'])
+  const marqueeXReverse = useTransform(scrollYProgress, [0, 1], ['-30%', '0%'])
+
   return (
-    <section className="bg-dark py-20 md:py-28 px-6 border-t border-b border-dark-border/40">
-      <div className="max-w-7xl mx-auto">
+    <section ref={sectionRef} className="relative py-12 md:py-20 overflow-hidden bg-surface-tinted">
+      {/* Teal radial glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.06] via-transparent to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-accent/[0.03] rounded-full blur-[80px] will-change-transform" />
 
-        {/* Encabezado */}
-        <div className="text-center mb-16 md:mb-20">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight"
-          >
+      {/* Marquee background */}
+      <div className="absolute inset-0 flex flex-col justify-center gap-4 opacity-[0.04] pointer-events-none overflow-hidden">
+        <motion.div className="flex whitespace-nowrap" style={{ x: marqueeX }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span key={i} className="text-[12rem] md:text-[18rem] font-black mx-8 text-white">
+              VERSAT
+            </span>
+          ))}
+        </motion.div>
+        <motion.div className="flex whitespace-nowrap" style={{ x: marqueeXReverse }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span key={i} className="text-[12rem] md:text-[18rem] font-black mx-8 text-accent/40">
+              SOFTWARE
+            </span>
+          ))}
+        </motion.div>
+      </div>
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-16 md:mb-20"
+        >
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-4">
             {VERSAT_STATS.title}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-gray-400 text-base md:text-lg max-w-3xl mx-auto leading-relaxed"
-          >
+          </h2>
+          <p className="text-zinc-300 text-lg max-w-2xl mx-auto">
             {VERSAT_STATS.description}
-          </motion.p>
-        </div>
+          </p>
+        </motion.div>
 
-        {/* Cards de métricas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto mb-12 md:mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
           {VERSAT_STATS.stats.map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-              className="relative flex flex-col items-center justify-center p-8 md:p-12 rounded-3xl md:rounded-[2rem] border border-accent/20 bg-dark-card hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all duration-200 text-center group"
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ delay: index * 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className={`text-center py-12 md:py-16 ${
+                index < 2 ? 'md:border-r border-surface-border' : ''
+              } ${index > 0 ? 'border-t md:border-t-0 border-surface-border' : ''}`}
             >
-              {/* Glow suave en hover */}
-              <div className="absolute inset-0 rounded-3xl md:rounded-[2rem] bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-              <span
-                className="text-5xl md:text-6xl lg:text-7xl font-black text-accent mb-3 md:mb-4 relative z-10"
-                style={{ textShadow: '0 0 20px rgba(0, 194, 168, 0.3)' }}
-              >
-                {stat.value}
-              </span>
-              <span className="text-gray-400 text-base md:text-lg font-medium relative z-10">
+              <div className="text-6xl md:text-8xl lg:text-9xl font-black font-mono leading-none mb-4 text-white">
+                <span className="text-accent">{stat.value}</span>
+              </div>
+              <div className="text-zinc-300 font-mono text-sm uppercase tracking-widest">
                 {stat.label}
-              </span>
+              </div>
             </motion.div>
           ))}
         </div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="text-center"
+          transition={{ delay: 0.6 }}
+          className="text-center mt-16 md:mt-24"
         >
-          <a
+          <motion.a
             href="#contacto"
-            className="inline-block bg-accent text-dark font-bold px-8 py-4 rounded-full hover:bg-accent/90 hover:scale-105 transition-all duration-200 shadow-lg shadow-accent/20 text-base md:text-lg"
+            className="inline-flex items-center gap-3 bg-accent text-surface font-bold px-10 py-5 text-sm"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
             {VERSAT_STATS.cta}
-          </a>
+            <span className="font-mono">&rarr;</span>
+          </motion.a>
         </motion.div>
-
       </div>
     </section>
   )
