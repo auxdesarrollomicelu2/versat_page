@@ -24,9 +24,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'framer-motion': ['framer-motion'],
-          'lenis': ['@studio-freight/lenis'],
+        manualChunks(id) {
+          if (id.includes('framer-motion')) return 'framer-motion'
+          if (id.includes('@studio-freight/lenis')) return 'lenis'
         },
       },
     },
