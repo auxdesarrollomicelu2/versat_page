@@ -16,7 +16,6 @@ export function useVisibleInterval<T extends HTMLElement = HTMLDivElement>(
   const ref = useRef<T | null>(null)
   const cbRef = useRef(callback)
 
-  // Always call the latest callback without re-creating the observer
   useEffect(() => {
     cbRef.current = callback
   }, [callback])
