@@ -27,11 +27,30 @@ export default function VersatFeatures() {
   const [expanded, setExpanded] = useState(0)
   const [mobileActive, setMobileActive] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
+  const mobileListRef = useRef<HTMLDivElement>(null)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "start start"]
   })
+
+  // Mobile: derive active item from the mobile list's scroll progress.
+  // As the list scrolls through the viewport, the active index advances.
+  const { scrollYProgress: mobileProgress } = useScroll({
+    target: mobileListRef,
+    // Active when list top hits 30% of viewport, ends when bottom hits 70%
+    offset: ["start 60%", "end 40%"],
+  })
+
+  useEffect(() => {
+    const total = VERSAT_FEATURES.length
+    const unsubscribe = mobileProgress.on('change', (v) => {
+      const clamped = Math.max(0, Math.min(0.999, v))
+      const idx = Math.floor(clamped * total)
+      setMobileActive((prev) => (prev === idx ? prev : idx))
+    })
+    return unsubscribe
+  }, [mobileProgress])
 
   const clipPath = useTransform(
     scrollYProgress,
@@ -189,8 +208,8 @@ export default function VersatFeatures() {
           </div>
         </div>
 
-        {/* MOBILE - Scroll-driven accordion: item closest to viewport center is active */}
-        <div className="md:hidden">
+        {/* MOBILE - Scroll-driven accordion: item index derived from scroll progress */}
+        <div ref={mobileListRef} className="md:hidden">
           {VERSAT_FEATURES.map((feature, index) => {
             const Icon = ICONS[feature.icon]
             const image = FEATURE_IMAGES[feature.image]
@@ -203,9 +222,6 @@ export default function VersatFeatures() {
                 image={image}
                 isActive={mobileActive === index}
                 onActivate={() => setMobileActive(index)}
-                onScrollDetect={(idx) => {
-                  setMobileActive((prev) => (prev === idx ? prev : idx))
-                }}
               />
             )
           })}
@@ -222,7 +238,6 @@ function MobileAccordionItem({
   image,
   isActive,
   onActivate,
-  onScrollDetect,
 }: {
   feature: typeof VERSAT_FEATURES[0]
   index: number
@@ -230,43 +245,9 @@ function MobileAccordionItem({
   image: string
   isActive: boolean
   onActivate: () => void
-  onScrollDetect: (index: number) => void
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  // Scroll-driven: the item whose center is closest to viewport's 40% line becomes active.
-  // Using a single rAF-throttled scroll listener prevents the toggle bug.
-  useEffect(() => {
-    const node = ref.current
-    if (!node) return
-
-    let ticking = false
-    const TRIGGER_LINE_RATIO = 0.4 // 40% from top of viewport
-
-    const check = () => {
-      ticking = false
-      const triggerY = window.innerHeight * TRIGGER_LINE_RATIO
-      const rect = node.getBoundingClientRect()
-      // Item is active when the trigger line passes through it
-      if (rect.top <= triggerY && rect.bottom >= triggerY) {
-        onScrollDetect(index)
-      }
-    }
-
-    const handleScroll = () => {
-      if (ticking) return
-      ticking = true
-      requestAnimationFrame(check)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    check() // initial check
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [index, onScrollDetect])
-
   return (
     <motion.div
-      ref={ref}
       onClick={onActivate}
       className="relative overflow-hidden border-b border-surface-border cursor-pointer"
       animate={{ height: isActive ? 340 : 64 }}

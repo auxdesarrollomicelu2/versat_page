@@ -141,7 +141,8 @@ export default function VersatNavbar() {
               animate={{ opacity: 1, clipPath: 'circle(150% at 100% 0%)' }}
               exit={{ opacity: 0, clipPath: 'circle(0% at 100% 0%)' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:hidden fixed inset-0 bg-surface z-40 flex flex-col"
+              className="lg:hidden fixed inset-0 z-40 flex flex-col"
+              style={{ backgroundColor: '#0b1013' }}
             >
               {/* Background decoration */}
               <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-accent/[0.05] rounded-full blur-[80px] will-change-transform" />
