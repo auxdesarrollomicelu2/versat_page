@@ -74,8 +74,8 @@ export default function VersatClients() {
 
         {/* Marquee strips - full bleed */}
         <div className="space-y-2 md:space-y-3">
-          <MarqueeRow logos={ROW_1} duration={20} direction="left" />
-          <MarqueeRow logos={ROW_2} duration={25} direction="right" />
+          <MarqueeRow logos={ROW_1} duration={40} direction="left" />
+          <MarqueeRow logos={ROW_2} duration={50} direction="right" />
         </div>
 
         {/* Bottom line */}

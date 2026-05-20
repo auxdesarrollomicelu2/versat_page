@@ -35,11 +35,11 @@ export default function VersatFeatures() {
   })
 
   // Mobile: derive active item from the mobile list's scroll progress.
-  // As the list scrolls through the viewport, the active index advances.
+  // Offset configured so that progress 0 = first item visible at center,
+  // progress 1 = last item at center.
   const { scrollYProgress: mobileProgress } = useScroll({
     target: mobileListRef,
-    // Active when list top hits 30% of viewport, ends when bottom hits 70%
-    offset: ["start 60%", "end 40%"],
+    offset: ["start 50%", "end 50%"],
   })
 
   useEffect(() => {
