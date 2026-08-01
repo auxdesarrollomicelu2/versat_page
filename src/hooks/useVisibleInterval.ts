@@ -52,7 +52,6 @@ export function useVisibleInterval<T extends HTMLElement = HTMLDivElement>(
 
     observer.observe(node)
 
-    // Pause when tab is hidden
     const handleVisibility = () => {
       if (document.hidden) stop()
       else if (node.getBoundingClientRect().top < window.innerHeight && node.getBoundingClientRect().bottom > 0) {
