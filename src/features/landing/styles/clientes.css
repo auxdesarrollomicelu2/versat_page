@@ -1,0 +1,261 @@
+/* TESTIMONIALS — carrusel 3D: la card central se ve nítida, las laterales chicas y borrosas según su distancia */
+
+.testimonials {
+  background: #09090b;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+.testimonials::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 900px; height: 600px;
+  background: radial-gradient(ellipse, rgba(0,194,168,.055) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.nv-ts {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 60px;
+}
+.nv-ts-header { margin-bottom: 56px; position: relative; }
+.nv-ts-eyebrow {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.nv-ts-h {
+  font-size: clamp(1.8rem,3vw,2.6rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: rgba(255,255,255,.5);
+  white-space: nowrap;
+}
+.nv-ts-h em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--teal);
+  font-size: 1.15em;
+  letter-spacing: -1px;
+  margin-left: .3ch;
+}
+
+/* ── escenario 3D ── */
+.nv-ts-ringstage {
+  position: relative;
+  height: 460px;
+  perspective: 1400px;
+}
+.nv-ts-ring {
+  position: absolute;
+  /* deja libre la franja de las flechas (44px + margen) para que su clic nunca quede tapado */
+  inset: 0 56px;
+  z-index: 1;
+  transform-style: preserve-3d;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.nv-ts-ring.is-dragging { cursor: grabbing; }
+.nv-ts-ring.is-dragging .nv-ts-card { transition: none; }
+
+/* flechas pegadas al borde del contenedor, centradas verticalmente */
+.nv-ts-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 500;
+  isolation: isolate;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,10,10,.7);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color .25s cubic-bezier(.16,1,.3,1), color .25s cubic-bezier(.16,1,.3,1), background .25s cubic-bezier(.16,1,.3,1), transform .25s cubic-bezier(.16,1,.3,1);
+}
+.nv-ts-arrow svg { width: 18px; height: 18px; }
+.nv-ts-arrow:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(0,194,168,.08);
+}
+.nv-ts-arrow-prev { left: 0; }
+.nv-ts-arrow-next { right: 0; }
+.nv-ts-arrow-prev:hover { transform: translateY(-50%) translateX(-2px); }
+.nv-ts-arrow-next:hover { transform: translateY(-50%) translateX(2px); }
+
+@media (max-width: 900px) {
+  .nv-ts-arrow {
+    width: 40px; height: 40px;
+    background: rgba(0,194,168,.1);
+    border-color: rgba(0,194,168,.3);
+    color: var(--teal);
+    backdrop-filter: blur(6px);
+  }
+  .nv-ts-arrow-prev { left: 0; }
+  .nv-ts-arrow-next { right: 0; }
+}
+
+.nv-ts-card {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: min(640px,86vw);
+  background:
+    radial-gradient(ellipse 500px 280px at 85% -10%, rgba(0,194,168,.12) 0%, transparent 60%),
+    linear-gradient(135deg, #12191c 0%, #0d1613 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 24px;
+  padding: 48px 52px 40px;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: transform .6s cubic-bezier(.16,1,.3,1), opacity .6s cubic-bezier(.16,1,.3,1), filter .6s cubic-bezier(.16,1,.3,1);
+}
+.nv-ts-card.is-front {
+  cursor: default;
+  box-shadow: 0 30px 70px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(0,194,168,.15);
+}
+
+.nv-ts-quote {
+  font-family: var(--font-sans);
+  font-style: italic;
+  font-size: clamp(1.15rem,1.7vw,1.5rem);
+  font-weight: 300;
+  color: #f5f5f3b6;
+  line-height: 1.4;
+  letter-spacing: -.2px;
+  margin: 0;
+  position: relative;
+}
+.nv-ts-quote strong {
+  font-style: normal;
+  color: var(--teal);
+  background: linear-gradient(135deg, var(--teal), #4dd9c8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nv-ts-stage-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  gap: 14px 20px;
+  flex-wrap: wrap;
+  position: relative;
+  min-width: 0;
+}
+.nv-ts-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.nv-ts-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), #007a68);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: .68rem;
+  letter-spacing: .5px;
+  color: #0a0a0a;
+  flex-shrink: 0;
+}
+.nv-ts-author-name {
+  font-size: .82rem;
+  font-weight: 700;
+  color: #ffffffa9;
+}
+.nv-ts-author-meta {
+  font-size: .66rem;
+  color: rgba(255, 255, 255, 0.685);
+  margin-top: 2px;
+}
+.nv-ts-dot-sep {
+  color: var(--teal);
+  margin: 0 5px;
+}
+
+.nv-ts-kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px 18px;
+  min-width: 0;
+}
+.nv-ts-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.nv-ts-kpi-n {
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: -.2px;
+}
+.nv-ts-kpi:nth-child(2) .nv-ts-kpi-n { color: #fbbf24; }
+.nv-ts-kpi-l {
+  font-size: .80rem;
+  font-weight: 100;
+  letter-spacing: .3px;
+  color: rgba(255, 255, 255, 0.452);
+}
+
+/* aviso "toca para ver" pegado a la tarjeta lateral que se toca */
+.nv-ts-touch-hint {
+  position: absolute;
+  transform: translate(-50%,-100%);
+  z-index: 30;
+  background: rgba(10,10,10,.92);
+  border: 1px solid rgba(0,194,168,.35);
+  color: var(--teal);
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 50px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s cubic-bezier(.16,1,.3,1);
+}
+.nv-ts-touch-hint.visible { opacity: 1; }
+
+@media (max-width: 900px) {
+  .nv-ts { padding: 56px 16px; }
+  .nv-ts-header { margin-bottom: 36px; }
+  /* mismo carrusel 3D que en escritorio, solo más compacto */
+  .nv-ts-ringstage { height: 380px; }
+  .nv-ts-card { width: min(320px,84vw); padding: 32px 24px 28px; }
+  .nv-ts-avatar { width: 30px; height: 30px; font-size: .6rem; }
+  .nv-ts-author-name { font-size: .76rem; }
+  .nv-ts-author-meta { font-size: .6rem; }
+  .nv-ts-kpis { gap: 12px 14px; }
+  .nv-ts-kpi-n { font-size: .7rem; }
+  .nv-ts-kpi-l { font-size: .62rem; }
+}

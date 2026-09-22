@@ -1,0 +1,70 @@
+/* FLOATING WHATSAPP BUTTON */
+
+.float-bubble-wrap {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.float-main-btn {
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  background: #25D366;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37,211,102,.4);
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .4s cubic-bezier(.16,1,.3,1), transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+}
+.float-main-btn.show { opacity: 1; transform: scale(1); }
+.float-main-btn:hover { transform: scale(1.08); box-shadow: 0 6px 26px rgba(37,211,102,.55); }
+.float-main-btn svg { width: 30px; height: 30px; }
+
+/* burbuja de bienvenida — aparece al cargar la página */
+.float-robot-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 260px;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid var(--teal);
+  border-radius: 14px 14px 2px 14px;
+  background: #0d0d0d;
+  color: #fff;
+  font-size: .82rem;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(8px) scale(.96);
+  pointer-events: none;
+  transition: opacity .3s cubic-bezier(.16,1,.3,1), transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.float-robot-msg.visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.float-msg-text { cursor: pointer; flex: 1; }
+.float-msg-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.5);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+}
+.float-msg-close:hover { color: #fff; }
+
+@media (max-width: 640px) {
+  .float-bubble-wrap { bottom: 18px; right: 18px; }
+  .float-robot-msg { max-width: 200px; font-size: .76rem; }
+}

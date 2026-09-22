@@ -1,0 +1,258 @@
+/* PÁGINAS DE RECURSOS — mismo sistema tipográfico y paleta que la landing */
+
+.doc {
+  padding: 132px 60px 0;
+  background:
+    radial-gradient(ellipse 900px 420px at 50% 0%, rgba(0,194,168,.07) 0%, transparent 62%),
+    var(--bg-a);
+}
+.doc-inner { max-width: 940px; margin: 0 auto; }
+
+/* ── volver ── */
+.doc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--txt-3);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease), gap var(--dur-fast) var(--ease);
+}
+.doc-back:hover { color: var(--teal); gap: 12px; }
+
+/* ── cabecera: título a la izquierda, gráfico propio del tema a la derecha ── */
+.doc-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 48px;
+  margin: 32px 0 0;
+  padding-bottom: 52px;
+  border-bottom: 1px solid var(--line);
+}
+.doc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 18px;
+}
+.doc-tag::before { content: '/'; opacity: .55; }
+.doc-title {
+  font-family: var(--font-sans);
+  font-size: clamp(1.4rem, 4.0vw, 4.1rem);
+  font-weight: 600;
+  letter-spacing: -1.6px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  color: #fff;
+}
+.doc-lede {
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--txt-2);
+  margin: 0;
+  max-width: none;
+}
+.doc-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  background: rgba(0,194,168,.04);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-lg);
+  padding: 26px;
+  min-height: 260px;
+}
+.doc-visual svg { width: 100%; max-width: 280px; height: auto; display: block; }
+
+/* ── cuerpo ── */
+.doc-body { padding: 52px 0 0; }
+.doc-body > * + * { margin-top: 22px; }
+
+.doc-h {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  line-height: 1.25;
+  color: #fff;
+  margin-top: 52px !important;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.doc-body > .doc-h:first-child { margin-top: 0 !important; }
+/* numeración de sección: el mismo idioma de dato que el resto del sitio */
+.doc-h-n {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.doc-p {
+  font-size: 1.32rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--txt-2);
+  margin: 0;
+  max-width: 68ch;
+}
+.doc-p strong { color: #fff; font-weight: 500; }
+.doc-p a { color: var(--teal); text-decoration: none; border-bottom: 1px solid var(--line-teal); }
+.doc-p a:hover { border-color: var(--teal); }
+
+/* lista de definiciones: clave en mono, valor en Outfit */
+.doc-defs {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+  margin-top: 26px !important;
+}
+.doc-defs li {
+  display: grid;
+  grid-template-columns: minmax(150px, .32fr) 1fr;
+  gap: 20px;
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.doc-def-k {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.doc-def-v {
+  font-size: .93rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--txt-2);
+}
+
+/* pasos numerados conectados — reusa el idioma de #por-que-versat */
+.doc-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 26px !important;
+}
+.doc-step {
+  position: relative;
+  padding: 0 0 30px 44px;
+}
+.doc-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 13px; top: 30px; bottom: 2px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--line-teal), rgba(0,194,168,.12));
+}
+.doc-step-n {
+  position: absolute;
+  left: 0; top: 1px;
+  width: 27px; height: 27px;
+  border-radius: 50%;
+  border: 1px solid var(--line-teal);
+  background: var(--bg-a);
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.doc-step-h {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 2px 0 8px;
+  letter-spacing: -.2px;
+}
+.doc-step-p {
+  font-size: .93rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--txt-2);
+  margin: 0;
+  max-width: 62ch;
+}
+
+/* fichas de integraciones / canales */
+.doc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 20px !important;
+}
+.doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: .84rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.8);
+  background: var(--surface-hi);
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  padding: 9px 16px;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.doc-chip:hover { border-color: var(--line-teal); background: rgba(0,194,168,.05); }
+.doc-chip i {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  opacity: .8;
+  flex-shrink: 0;
+}
+
+/* nota al margen — para aclaraciones honestas, no para marketing */
+.doc-note {
+  border-left: 2px solid var(--line-teal);
+  background: rgba(0,194,168,.035);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 18px 22px;
+  margin-top: 28px !important;
+  font-size: .9rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--txt-2);
+}
+.doc-note strong { color: var(--teal); font-weight: 600; }
+
+/* separación antes del pie */
+.doc-foot-space { height: 96px; }
+
+@media (max-width: 860px) {
+  .doc { padding: 108px 24px 0; }
+  .doc-head {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-bottom: 36px;
+  }
+  .doc-visual { min-height: 150px; order: -1; }
+  .doc-body { padding-top: 38px; }
+  .doc-h { font-size: 1.2rem; margin-top: 40px !important; gap: 10px; }
+  .doc-defs li { grid-template-columns: 1fr; gap: 6px; }
+  .doc-foot-space { height: 64px; }
+}

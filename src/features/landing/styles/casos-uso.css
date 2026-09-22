@@ -1,0 +1,348 @@
+/* CASOS DE USO — cada card dibuja su flujo con un recurso propio (cadena, turnos, línea de tiempo, ciclo), no la misma fila de chips */
+
+.casos-uso { background: var(--bg-c); }
+.casos-uso .section-inner { max-width: var(--content-width); margin: 0 auto; }
+/* solo la cabecera va centrada, las tarjetas se alinean a la izquierda */
+.casos-uso .casos-uso-head { text-align: center; margin-bottom: 56px; }
+.casos-uso .casos-uso-head .section-sub { margin: 0 auto; }
+.casos-uso .casos-uso-head .section-tag { justify-content: center; }
+
+.casos-uso-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+/* ── tarjeta base ── */
+.case {
+  position: relative;
+  background: linear-gradient(165deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+/* hairline superior que se enciende en hover, en vez de una sombra */
+.case::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+.case:hover { border-color: var(--line-teal); transform: translateY(-3px); }
+.case:hover::before { opacity: 1; }
+
+.case-body {
+  padding: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* cabecera: índice mono + etiqueta de categoría en una sola línea */
+.case-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 2px;
+}
+.case-idx {
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: .5px;
+  flex-shrink: 0;
+}
+.case-idx::after {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background: var(--line-teal);
+  vertical-align: middle;
+  margin-left: 12px;
+}
+.case-tag {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--txt-3);
+}
+
+.case-title {
+  font-family: var(--font-sans);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -.6px;
+  line-height: 1.15;
+  margin: 0;
+}
+.case-text {
+  font-size: .93rem;
+  font-weight: 300;
+  color: var(--txt-2);
+  line-height: 1.72;
+  margin: 0;
+  max-width: 52ch;
+}
+
+.case-motif { margin-top: 8px; }
+
+/* ── motivo 1: cadena horizontal (ventas) ── */
+.case-motif--chain {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chain-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .78rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.78);
+  background: var(--surface-hi);
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  padding: 7px 14px;
+  white-space: nowrap;
+}
+.chain-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--txt-4);
+  flex-shrink: 0;
+}
+.chain-node.is-end {
+  border-color: var(--line-teal);
+  background: rgba(0,194,168,.08);
+  color: #fff;
+}
+.chain-node.is-end .chain-dot {
+  background: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0,194,168,.18);
+  animation: casePulse 2.4s ease-in-out infinite;
+}
+@keyframes casePulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(0,194,168,.18); }
+  50% { box-shadow: 0 0 0 5px rgba(0,194,168,.05); }
+}
+.chain-link {
+  width: 16px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), var(--line-teal));
+  flex-shrink: 0;
+}
+
+/* ── motivo 2: turnos de conversación (postventa) ── */
+.case-motif--turns {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: flex-start;
+  max-width: 400px;
+}
+.turn {
+  font-size: .8rem;
+  font-weight: 400;
+  line-height: 1.45;
+  padding: 9px 14px;
+  max-width: 85%;
+  position: relative;
+}
+.turn--in {
+  align-self: flex-start;
+  background: var(--surface-hi);
+  border: 1px solid var(--line);
+  color: rgba(255,255,255,.72);
+  border-radius: 12px 12px 12px 3px;
+}
+.turn--out {
+  align-self: flex-end;
+  background: rgba(0,194,168,.09);
+  border: 1px solid var(--line-teal);
+  color: #fff;
+  border-radius: 12px 12px 3px 12px;
+}
+
+/* ── motivo 3: línea de tiempo vertical (agendamiento) ── */
+.case-motif--timeline {
+  list-style: none;
+  position: relative;
+  padding-left: 4px;
+}
+.tl-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  padding: 7px 0 7px 0;
+}
+/* línea que conecta un paso con el siguiente, se dibuja al entrar */
+.tl-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 26px;
+  bottom: -4px;
+  width: 1px;
+  background: var(--line-teal);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform .5s var(--ease);
+  transition-delay: calc(var(--tl) * .12s + .25s);
+}
+.case.visible .tl-step:not(:last-child)::before { transform: scaleY(1); }
+.tl-num {
+  flex-shrink: 0;
+  width: 25px; height: 25px;
+  border-radius: 50%;
+  border: 1px solid var(--line-teal);
+  background: var(--bg-c);
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.tl-step:last-child .tl-num {
+  background: rgba(0,194,168,.14);
+  border-color: var(--teal);
+}
+.tl-label {
+  font-size: .84rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.78);
+}
+
+/* ── motivo 4: ciclo que se cierra (fidelización) ── */
+.case-motif--loop { padding-bottom: 4px; }
+.loop-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.loop-step {
+  font-size: .78rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.78);
+  background: var(--surface-hi);
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  padding: 7px 14px;
+  white-space: nowrap;
+}
+.loop-link {
+  width: 16px; height: 1px;
+  background: var(--line-strong);
+  flex-shrink: 0;
+}
+/* corchete de retorno: baja del último paso, cruza y vuelve al primero */
+.loop-return {
+  height: 13px;
+  max-width: 420px;
+  margin: 8px 18px 0;
+  border: 1px solid var(--line-teal);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+}
+.loop-label {
+  display: block;
+  max-width: 456px;
+  margin-top: 7px;
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .8px;
+  color: var(--teal);
+  text-align: center;
+}
+
+/* ── media: marco de producto alrededor del video real ── */
+.case-media { min-width: 0; }
+.case-screen {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: #0d0d0d;
+  box-shadow: 0 24px 60px -24px rgba(0,0,0,.7);
+}
+.case-screen-view {
+  aspect-ratio: 16/9;
+  background: #000;
+  display: block;
+}
+.case-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none; /* el usuario no puede pausar, buscar ni interactuar */
+  display: block;
+}
+.case-video-empty {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.02);
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  letter-spacing: 1px;
+  color: var(--txt-4);
+}
+
+/* misma composición para las 4 cards, alternando qué lado lleva el video */
+.case {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+.case-body { padding: 26px 22px 26px 26px; }
+
+/* cards pares invierten el orden: video a la izquierda, texto a la derecha */
+.case:nth-of-type(even) {
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+}
+.case:nth-of-type(even) .case-media { order: -1; }
+.case:nth-of-type(even) .case-body { padding: 26px 26px 26px 22px; }
+
+@media (max-width: 980px) {
+  /* .case:nth-of-type(even) es más específico que .case sola, así que hay que igualarla aquí
+     o si no se queda con el grid-template-columns de escritorio en las cards pares */
+  .case,
+  .case:nth-of-type(even) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .case:nth-of-type(even) .case-media { order: 0; }
+  .case-body { padding: 26px 20px 20px; order: 2; }
+  .case-media { order: 1; }
+}
+
+@media (max-width: 820px) {
+  .casos-uso .casos-uso-head { margin-bottom: 40px; }
+  .casos-uso-grid { gap: 18px; }
+  .case-body { padding: 24px 18px; }
+  .case-title { font-size: 1.25rem; }
+  .turn { max-width: 100%; }
+  .case-motif--chain { gap: 6px; }
+  .chain-node, .loop-step { font-size: .74rem; padding: 6px 12px; }
+  .chain-link, .loop-link { width: 10px; }
+}
