@@ -25,7 +25,7 @@ export default function NavigationButton({
   const textX = useTransform(x, (v) => v * 0.5)
   const textY = useTransform(y, (v) => v * 0.5)
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
