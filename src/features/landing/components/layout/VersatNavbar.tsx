@@ -19,6 +19,7 @@ export default function VersatNavbar() {
   const linksRef = useRef<HTMLUListElement | null>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const ctaRef = useMagnetic<HTMLAnchorElement>({ radius: 50, strength: 0.2 });
+  const backRef = useMagnetic<HTMLAnchorElement>({ radius: 40, strength: 0.2 });
 
   useEffect(() => {
     function updateActiveLink() {
@@ -59,6 +60,11 @@ export default function VersatNavbar() {
     <nav className={scrolled ? 'is-scrolled' : ''}>
       <div className="nav-logo">
         <Link to="."><img src={asset('/assets/images/versat.png')} alt="VERSAT" /></Link>
+        <Link to="/" className="nav-back" ref={backRef} aria-label="Volver a Home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </Link>
       </div>
       <ul className="nav-links" ref={linksRef}>
         <span

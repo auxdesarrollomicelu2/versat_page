@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from
 import { VERSAT_NAV_LINKS } from '../../lib/versat.constants'
 import { useBooking } from '../../hooks/useBooking'
 import BookingModal from '../ui/BookingModal'
+import NavigationButton from '../ui/NavigationButton'
 import logo from '../../assets/images/versat.logo.png'
 
 export default function VersatNavbar() {
@@ -96,8 +97,9 @@ export default function VersatNavbar() {
             })}
           </ul>
 
-          {/* Right CTA - magnetic button */}
+          {/* Right CTA - magnetic buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <NavigationButton to="/landing-preview" label="CRM" variant="primary" />
             <MagneticButton onClick={booking.openModal} />
           </div>
 
@@ -197,6 +199,15 @@ export default function VersatNavbar() {
                     &rarr;
                   </motion.span>
                 </motion.button>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="mt-4"
+                >
+                  <NavigationButton to="/landing-preview" label="Ir a CRM" variant="primary" className="w-full text-center justify-center" />
+                </motion.div>
               </div>
 
               {/* Bottom info */}
